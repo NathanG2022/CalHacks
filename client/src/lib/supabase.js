@@ -39,3 +39,4 @@ export const signInWithMicrosoft = async () => {
     provider: 'azure',
   });
 };
+

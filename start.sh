@@ -11,3 +11,4 @@ fi
 # Start the application
 echo "🎯 Starting development servers..."
 npm run dev
+

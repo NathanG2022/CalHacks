@@ -312,3 +312,4 @@ The application will be available at:
 - **Backend**: http://localhost:3001
 
 Happy coding! 🎉
+

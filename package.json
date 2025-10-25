@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev:dynamic": "node start-dynamic.js",
     "server:dev": "cd server && npm run dev",
     "client:dev": "cd client && npm run dev",
     "server:start": "cd server && npm start",
@@ -29,3 +30,4 @@
     "@supabase/supabase-js": "^2.75.1"
   }
 }
+
