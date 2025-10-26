@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [serverStatus, setServerStatus] = useState('unknown');
 
   const quickActionsRef = useRef(null);
-  const [targetModel, setTargetModel] = useState('llama2-7b');
+  const [targetModel, setTargetModel] = useState('qwen2.5-VL-7b');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -416,6 +416,7 @@ const Dashboard = () => {
           onChange={(e) => setTargetModel(e.target.value)}
           className="cyber-input mt-1"
         >
+          <option value="qwen2.5-VL-7b">Qwen2.5-VL-7b-Instruct</option>
           <option value="llama2-7b">LLaMA 2 - 7B</option>
           <option value="llama2-13b">LLaMA 2 - 13B</option>
           <option value="mistral-7b">Mistral 7B</option>
@@ -455,7 +456,7 @@ const Dashboard = () => {
             }
             console.log('Creating job:', { name: newJobName, model: targetModel, prompt: newJobPrompt });
 
-            setShowNewJobModal(false);
+            // setShowNewJobModal(false);
 
             try {
               setNewJobLoading(true);
@@ -464,7 +465,7 @@ const Dashboard = () => {
               const res = await getQwenResponse(newJobPrompt);
               // store/display response
               setNewJobResult(res);
-              console.log('AI response for job:', { name: newJobName, response: res });
+              console.log('Initial AI response for job:', { name: newJobName, response: res });
 
               // Optionally create a lightweight job entry in items list
               setItems(prev => [...prev, { id: Date.now(), name: newJobName, result: res }]);
@@ -487,8 +488,9 @@ const Dashboard = () => {
         {newJobLoading && <div className="text-sm text-gray-600">Running job...</div>}
         {newJobResult && (
           <div className="mt-3 p-3 bg-gray-100 rounded text-sm text-gray-800 max-h-48 overflow-auto">
-            <strong>Result:</strong>
+            <strong>Initial Result:</strong>
             <pre className="whitespace-pre-wrap text-xs mt-2">{typeof newJobResult === 'string' ? newJobResult : JSON.stringify(newJobResult, null, 2)}</pre>
+            <pre className="whitespace-pre-wrap text-lg mt-2">Red-team Job Submitted </pre>
           </div>
         )}
       </div>
