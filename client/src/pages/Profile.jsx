@@ -1,5 +1,4 @@
 import { useAuth } from '../contexts/AuthContext';
-import HackerBackground from '../components/HackerBackground';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -48,5 +47,6 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
