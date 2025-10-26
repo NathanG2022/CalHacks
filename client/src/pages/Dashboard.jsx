@@ -511,9 +511,9 @@ const Dashboard = () => {
         {showRAGPrompts && ragPrompts.length > 0 && (
           <div className="mt-20">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900">🎯 Generated Attack Prompts</h2>
+              <h2 className="text-2xl font-semibold text-white">🎯 Generated Attack Prompts</h2>
               <button
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-300 hover:text-white"
                 onClick={() => setShowRAGPrompts(false)}
               >
                 Hide
@@ -521,20 +521,20 @@ const Dashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {ragPrompts.map((prompt, index) => (
-                <div key={index} className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div key={index} className="p-4 bg-red-900/30 border border-red-500/50 rounded-lg backdrop-blur-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="text-sm font-medium text-red-600 bg-red-100 px-2 py-1 rounded">
+                    <span className="text-sm font-medium text-red-300 bg-red-800/50 px-2 py-1 rounded">
                       {prompt.category || 'general'}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-300">
                       {(prompt.confidence * 100).toFixed(0)}% confidence
                     </span>
                   </div>
-                  <div className="text-gray-800 text-sm leading-relaxed mb-2">
+                  <div className="text-gray-200 text-sm leading-relaxed mb-2">
                     {prompt.content}
                   </div>
                   {prompt.template && (
-                    <div className="text-xs text-gray-500 italic border-t pt-2">
+                    <div className="text-xs text-gray-400 italic border-t border-gray-600 pt-2">
                       Template: {prompt.template}
                     </div>
                   )}
@@ -545,57 +545,57 @@ const Dashboard = () => {
         )}
 
         {/* Metrics */}
-        <div className="mt-20">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900">Metrics & Analytics</h2>
+        <div className="mt-20 relative z-10">
+          <h2 className="text-2xl font-semibold mb-6 text-white">Metrics & Analytics</h2>
 
           {/* Top Row - Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Current Model Version Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-red-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Current Model Version</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{availableModels[selectedModel].name}</div>
-              <p className="text-sm text-gray-600">Selected Model</p>
-              <div className="text-xs text-gray-500 mt-1">
+            <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-l-4 border-red-500 border border-gray-700">
+              <h3 className="text-sm font-medium text-gray-300 mb-2">Current Model Version</h3>
+              <div className="text-3xl font-bold text-white mb-1">{availableModels[selectedModel].name}</div>
+              <p className="text-sm text-gray-400">Selected Model</p>
+              <div className="text-xs text-gray-400 mt-1">
                 {availableModels[selectedModel].provider} • {availableModels[selectedModel].size}
               </div>
-              <div className="mt-4 text-xs text-gray-500">
+              <div className="mt-4 text-xs text-gray-400">
                 <div className="flex justify-between mb-1">
                   <span>Vulnerability Score:</span>
-                  <span className="font-semibold text-red-600">7.2/10</span>
+                  <span className="font-semibold text-red-400">7.2/10</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tests Passed:</span>
-                  <span className="font-semibold text-green-600">67%</span>
+                  <span className="font-semibold text-green-400">67%</span>
                 </div>
               </div>
             </div>
 
             {/* Total Tests Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Tests Run</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">2,847</div>
-              <p className="text-sm text-green-600">+342 from last week</p>
+            <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-l-4 border-blue-500 border border-gray-700">
+              <h3 className="text-sm font-medium text-gray-300 mb-2">Total Tests Run</h3>
+              <div className="text-3xl font-bold text-white mb-1">2,847</div>
+              <p className="text-sm text-green-400">+342 from last week</p>
               <div className="mt-4">
-                <div className="text-xs text-gray-500 mb-1">This week</div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="text-xs text-gray-400 mb-1">This week</div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
                   <div className="bg-blue-500 h-2 rounded-full" style={{width: '78%'}}></div>
                 </div>
               </div>
             </div>
 
             {/* Successful Canary Hits Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-green-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Successful Canary Hits</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">1,204</div>
-              <p className="text-sm text-gray-600">42.3% success rate</p>
-              <div className="mt-4 text-xs text-gray-500">
+            <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-l-4 border-green-500 border border-gray-700">
+              <h3 className="text-sm font-medium text-gray-300 mb-2">Successful Canary Hits</h3>
+              <div className="text-3xl font-bold text-white mb-1">1,204</div>
+              <p className="text-sm text-green-400">42.3% success rate</p>
+              <div className="mt-4 text-xs text-gray-400">
                 <div className="flex justify-between mb-1">
                   <span>Critical:</span>
-                  <span className="font-semibold text-red-600">89</span>
+                  <span className="font-semibold text-red-400">89</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Medium:</span>
-                  <span className="font-semibold text-yellow-600">315</span>
+                  <span className="font-semibold text-yellow-400">315</span>
                 </div>
               </div>
             </div>
@@ -604,8 +604,8 @@ const Dashboard = () => {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Tests Over Time - CSS Bar Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tests Run Over Time</h3>
+            <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4">Tests Run Over Time</h3>
               <div className="h-64 flex flex-col">
                 <div className="flex-1 flex items-end justify-between gap-3 pb-2">
                   {[
@@ -634,17 +634,17 @@ const Dashboard = () => {
                     );
                   })}
                 </div>
-                <div className="flex justify-between pt-2 border-t border-gray-200">
+                <div className="flex justify-between pt-2 border-t border-gray-600">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-                    <span key={i} className="flex-1 text-center text-xs text-gray-600">{day}</span>
+                    <span key={i} className="flex-1 text-center text-xs text-gray-300">{day}</span>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* Success Rate - CSS Donut Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Canary Hit Distribution</h3>
+            <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4">Canary Hit Distribution</h3>
               <div className="h-64 flex items-center justify-center">
                 <div className="relative w-48 h-48">
                   {/* Donut segments */}
@@ -685,8 +685,8 @@ const Dashboard = () => {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-2xl font-bold">2,847</div>
-                      <div className="text-xs text-gray-500">Total</div>
+                      <div className="text-2xl font-bold text-white">2,847</div>
+                      <div className="text-xs text-gray-300">Total</div>
                     </div>
                   </div>
                 </div>
@@ -694,26 +694,26 @@ const Dashboard = () => {
               <div className="flex justify-center gap-4 mt-4 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-green-500 rounded"></div>
-                  <span>Successful (1,204)</span>
+                  <span className="text-gray-300">Successful (1,204)</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-red-500 rounded"></div>
-                  <span>Failed (1,483)</span>
+                  <span className="text-gray-300">Failed (1,483)</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-gray-400 rounded"></div>
-                  <span>Inconclusive (160)</span>
+                  <span className="text-gray-300">Inconclusive (160)</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Recent Findings Timeline */}
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Findings Timeline (Last 30 Days)</h3>
+          <div className="bg-gray-900/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700">
+            <h3 className="text-lg font-semibold text-white mb-4">Recent Findings Timeline (Last 30 Days)</h3>
             <div className="h-80 relative">
               {/* Y-axis labels */}
-              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-500 w-8">
+              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-300 w-8">
                 <span>120</span>
                 <span>90</span>
                 <span>60</span>

@@ -19,10 +19,16 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return showSignUp ? (
-      <SignUp onSuccess={() => setShowSignUp(false)} onSwitchToSignIn={() => setShowSignUp(false)} />
-    ) : (
-      <SignIn onSuccess={() => {}} onSwitchToSignUp={() => setShowSignUp(true)} />
+    return (
+      <div className="min-h-screen bg-black relative">
+        {/* Hacker Background */}
+        <HackerBackground />
+        {showSignUp ? (
+          <SignUp onSuccess={() => setShowSignUp(false)} onSwitchToSignIn={() => setShowSignUp(false)} />
+        ) : (
+          <SignIn onSuccess={() => {}} onSwitchToSignUp={() => setShowSignUp(true)} />
+        )}
+      </div>
     );
   }
 
