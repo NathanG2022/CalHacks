@@ -36,26 +36,26 @@ function AppContent() {
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <Link
                   to="/"
-                  className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-5 border-b-2 font-medium text-sm"
+                  className="border-transparent text-gray-900 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-5 border-b-2 font-medium text-sm"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/Settings"
-                  className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-0 border-b-2 font-medium text-sm"
+                  className="border-transparent text-gray-900 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-1 border-b-2 font-medium text-sm"
                 >
                   Jobs
                 </Link>
                 <Link
                   to="/Profile"
-                  className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-1 border-b-2 font-medium text-sm"
+                  className="border-transparent text-gray-900 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-4 border-b-2 font-medium text-sm"
                 >
                   Profile
                 </Link>
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-sm text-gray-700">Welcome, {user?.user_metadata?.name?.split(' ')[0] || 'User'}!</span>
+              <span className="text-sm text-gray-900">Welcome, {user?.user_metadata?.name?.split(' ')[0] || 'User'}!</span>
             </div>
           </div>
         </div>
