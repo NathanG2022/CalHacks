@@ -48,7 +48,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-primary-900/20 border border-primary-500 text-primary-300 px-4 py-3 rounded-lg">
+            <div className="bg-red-900/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
@@ -112,7 +112,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
             Already have an account?{' '}
             <button
               onClick={onSwitchToSignIn}
-              className="font-medium text-primary-500 hover:text-primary-400"
+              className="font-medium text-red-500 hover:text-red-400"
             >
               Sign in
             </button>
