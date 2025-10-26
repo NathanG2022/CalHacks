@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import EnhancedAI from './components/EnhancedAI';
+import HackerBackground from './components/HackerBackground';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SignIn, SignUp } from './components/Auth';
@@ -26,7 +27,10 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black relative">
+      {/* Hacker Background */}
+      <HackerBackground />
+      
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-red-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

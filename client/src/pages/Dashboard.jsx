@@ -4,6 +4,7 @@ import { apiService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { getQwenResponse, generateRAGPrompts } from '../services/ai';
 import CrescendoAttack from '../components/CrescendoAttack';
+import HackerBackground from '../components/HackerBackground';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -278,7 +279,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black text-white relative">
+      {/* Hacker Background */}
+      <HackerBackground />
+      
       {/* Header */}
       {/*
       <header className="bg-white shadow">
@@ -314,17 +318,17 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8">
 
         {/* Mission Box Section */}
-        <div className="mt-80 bg-red-500/30 p-8 max-w-4xl mx-auto shadow-lg">
-          <h1 className="text-5xl font-semibold text-gray-900 mb-4">
+        <div className="mt-80 bg-red-500/30 p-8 max-w-4xl mx-auto shadow-lg backdrop-blur-sm border border-red-900/30 rounded-lg relative z-10">
+          <h1 className="text-5xl font-semibold text-white mb-4">
             A platform for AI red-teaming
           </h1>
-          <p className="text-xl text-gray-800 mb-6">
+          <p className="text-xl text-gray-200 mb-6">
             We built an autonomous AI red-teaming agent using Letta to continuously generate and test jailbreaks for small open source LLMs.
           </p>
           <div className="flex flex-wrap gap-4">
             
             <button 
-            className="bg-black text-lg text-white px-6 py-3 rounded hover:bg-gray-900 transition"
+            className="bg-red-600 text-lg text-white px-6 py-3 rounded hover:bg-red-700 transition"
             onClick={scrollToQuickActions}>
               Get started
             </button>
@@ -332,8 +336,8 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions Section */}
-        <div ref={quickActionsRef} className="mb-16">
-          <h2 className="mt-40 text-xl font-semibold mb-6 text-gray-900">Quick Actions</h2>
+        <div ref={quickActionsRef} className="mb-16 relative z-10">
+          <h2 className="mt-40 text-xl font-semibold mb-6 text-white">Quick Actions</h2>
           <div className="flex flex-wrap gap-4">
             <button 
             className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
