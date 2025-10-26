@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 
@@ -8,6 +8,8 @@ const Dashboard = () => {
   const [newItem, setNewItem] = useState('');
   const [loading, setLoading] = useState(false);
   const [serverStatus, setServerStatus] = useState('unknown');
+
+  const quickActionsRef = useRef(null);
 
   useEffect(() => {
     checkServerHealth();
@@ -78,9 +80,16 @@ const Dashboard = () => {
     }
   };
 
+  const scrollToQuickActions = () => {
+    if (quickActionsRef.current) {
+      quickActionsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
+      {/*
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -109,70 +118,283 @@ const Dashboard = () => {
           </div>
         </div>
       </header>
-
+*/}
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-6">CalHacks Todo Items</h2>
-              
-              {/* Add Item Form */}
-              <form onSubmit={handleAddItem} className="mb-6">
-                <div className="flex gap-4">
-                  <input
-                    type="text"
-                    value={newItem}
-                    onChange={(e) => setNewItem(e.target.value)}
-                    placeholder="Add a new CalHacks task..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                  >
-                    {loading ? 'Adding...' : 'Add Item'}
-                  </button>
-                </div>
-              </form>
+      <main className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8">
 
-              {/* Items List */}
-              <div className="space-y-3">
-                {loading && items.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">Loading items...</div>
-                ) : items.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    No items yet. Add one above!
-                  </div>
-                ) : (
-                  items.map(item => (
-                    <div
-                      key={item.id}
-                      className={`flex items-center p-4 border rounded-lg ${
-                        item.completed ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={() => handleToggleItem(item.id)}
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      />
-                      <span className={`ml-3 flex-1 ${
-                        item.completed ? 'line-through text-gray-500' : 'text-gray-900'
-                      }`}>
-                        {item.name}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="ml-3 text-red-600 hover:text-red-800 text-sm font-medium"
-                      >
-                        Delete
-                      </button>
+        {/* Mission Box Section */}
+        <div className="mt-80 bg-red-500/30 p-8 max-w-4xl mx-auto shadow-lg">
+          <h1 className="text-5xl font-semibold text-gray-900 mb-4">
+            A platform for AI red-teaming
+          </h1>
+          <p className="text-xl text-gray-800 mb-6">
+            We built an autonomous AI red-teaming agent using Letta to continuously generate and test jailbreaks for small open source LLMs.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            
+            <button 
+            className="bg-black text-lg text-white px-6 py-3 rounded hover:bg-gray-900 transition"
+            onClick={scrollToQuickActions}>
+              Get started
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Actions Section */}
+        <div ref={quickActionsRef} className="mb-16">
+          <h2 className="mt-40 text-xl font-semibold mb-6 text-gray-900">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+              Run new job
+            </button>
+            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+              Re-run last failing job
+            </button>
+            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+              View active jobs
+            </button>
+            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+              Export report
+            </button>
+          </div>
+        </div>
+        {/* Metrics */}
+        <div className="mt-20">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-900">Metrics & Analytics</h2>
+
+          {/* Top Row - Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Current Model Version Card */}
+            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Current Model Version</h3>
+              <div className="text-3xl font-bold text-gray-900 mb-1">Llama-3.2-1B</div>
+              <p className="text-sm text-gray-600">Deployed: 2 days ago</p>
+              <div className="mt-4 text-xs text-gray-500">
+                <div className="flex justify-between mb-1">
+                  <span>Vulnerability Score:</span>
+                  <span className="font-semibold text-red-600">7.2/10</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tests Passed:</span>
+                  <span className="font-semibold text-green-600">67%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Tests Card */}
+            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Tests Run</h3>
+              <div className="text-3xl font-bold text-gray-900 mb-1">2,847</div>
+              <p className="text-sm text-green-600">+342 from last week</p>
+              <div className="mt-4">
+                <div className="text-xs text-gray-500 mb-1">This week</div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '78%'}}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Successful Canary Hits Card */}
+            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-green-500">
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Successful Canary Hits</h3>
+              <div className="text-3xl font-bold text-gray-900 mb-1">1,204</div>
+              <p className="text-sm text-gray-600">42.3% success rate</p>
+              <div className="mt-4 text-xs text-gray-500">
+                <div className="flex justify-between mb-1">
+                  <span>Critical:</span>
+                  <span className="font-semibold text-red-600">89</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Medium:</span>
+                  <span className="font-semibold text-yellow-600">315</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Tests Over Time - CSS Bar Chart */}
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tests Run Over Time</h3>
+              <div className="h-64 flex flex-col">
+                <div className="flex-1 flex items-end justify-between gap-3 pb-2">
+                  {[
+                    { day: 'Mon', value: 320 },
+                    { day: 'Tue', value: 445 },
+                    { day: 'Wed', value: 380 },
+                    { day: 'Thu', value: 510 },
+                    { day: 'Fri', value: 425 },
+                    { day: 'Sat', value: 390 },
+                    { day: 'Sun', value: 377 }
+                  ].map((item, i) => {
+                    const maxValue = 510;
+                    const heightPercent = (item.value / maxValue) * 100;
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+                        <div
+                          className="w-full bg-red-500 rounded-t hover:bg-red-600 transition-colors relative group cursor-pointer min-h-[20px]"
+                          style={{height: `${heightPercent}%`}}
+                          title={`${item.value} tests`}
+                        >
+                          <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-semibold bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {item.value}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between pt-2 border-t border-gray-200">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                    <span key={i} className="flex-1 text-center text-xs text-gray-600">{day}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Success Rate - CSS Donut Chart */}
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Canary Hit Distribution</h3>
+              <div className="h-64 flex items-center justify-center">
+                <div className="relative w-48 h-48">
+                  {/* Donut segments */}
+                  <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                    {/* Successful Hits - 42.3% (green) */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="rgb(34, 197, 94)"
+                      strokeWidth="20"
+                      strokeDasharray="106 314"
+                      strokeDashoffset="0"
+                    />
+                    {/* Failed Attempts - 52.1% (red) */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="rgb(239, 68, 68)"
+                      strokeWidth="20"
+                      strokeDasharray="164 314"
+                      strokeDashoffset="-106"
+                    />
+                    {/* Inconclusive - 5.6% (gray) */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="rgb(156, 163, 175)"
+                      strokeWidth="20"
+                      strokeDasharray="18 314"
+                      strokeDashoffset="-270"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">2,847</div>
+                      <div className="text-xs text-gray-500">Total</div>
                     </div>
-                  ))
-                )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center gap-4 mt-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-green-500 rounded"></div>
+                  <span>Successful (1,204)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-red-500 rounded"></div>
+                  <span>Failed (1,483)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-gray-400 rounded"></div>
+                  <span>Inconclusive (160)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Findings Timeline */}
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Findings Timeline (Last 30 Days)</h3>
+            <div className="h-80 relative">
+              {/* Y-axis labels */}
+              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-500 w-8">
+                <span>120</span>
+                <span>90</span>
+                <span>60</span>
+                <span>30</span>
+                <span>0</span>
+              </div>
+
+              {/* Chart area */}
+              <div className="ml-10 h-full pb-8 relative">
+                {/* Grid lines */}
+                <div className="absolute inset-0 flex flex-col justify-between">
+                  {[0, 1, 2, 3, 4].map(i => (
+                    <div key={i} className="border-t border-gray-200"></div>
+                  ))}
+                </div>
+
+                {/* Data visualization */}
+                <svg className="w-full h-full" preserveAspectRatio="none">
+                  {/* Low Findings - Blue */}
+                  <polyline
+                    points="0,230 80,180 160,130 240,90 320,60 400,40 480,20"
+                    fill="rgba(59, 130, 246, 0.1)"
+                    stroke="rgb(59, 130, 246)"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  {/* Medium Findings - Yellow */}
+                  <polyline
+                    points="0,260 80,240 160,220 240,190 320,180 400,150 480,140"
+                    fill="rgba(251, 191, 36, 0.1)"
+                    stroke="rgb(251, 191, 36)"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  {/* Critical Findings - Red */}
+                  <polyline
+                    points="0,285 80,275 160,270 240,265 320,260 400,255 480,250"
+                    fill="rgba(239, 68, 68, 0.1)"
+                    stroke="rgb(239, 68, 68)"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+
+                {/* X-axis labels */}
+                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-500">
+                  <span>Day 1</span>
+                  <span>Day 5</span>
+                  <span>Day 10</span>
+                  <span>Day 15</span>
+                  <span>Day 20</span>
+                  <span>Day 25</span>
+                  <span>Day 30</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="flex justify-center gap-6 mt-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-red-500"></div>
+                <span>Critical (22)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-yellow-500"></div>
+                <span>Medium (67)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-blue-500"></div>
+                <span>Low (108)</span>
               </div>
             </div>
           </div>

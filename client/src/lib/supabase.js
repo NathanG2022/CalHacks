@@ -12,10 +12,15 @@ export const signIn = async (email, password) => {
   });
 };
 
-export const signUp = async (email, password) => {
+export const signUp = async (email, password, name) => {
   return await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        name: name,  // Store name in user_metadata
+      }
+    }
   });
 };
 
