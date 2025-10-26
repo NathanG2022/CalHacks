@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { getQwenResponse } from '../services/ai';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -84,7 +85,9 @@ const Dashboard = () => {
   const [showNewJobModal, setShowNewJobModal] = useState(false);
   const [newJobName, setNewJobName] = useState('');
   const [newJobPrompt, setNewJobPrompt] = useState('');
-
+  const [newJobLoading, setNewJobLoading] = useState(false);
+  const [newJobResult, setNewJobResult] = useState(null);
+  
   const scrollToQuickActions = () => {
     if (quickActionsRef.current) {
     const yOffset = -100;
@@ -449,21 +452,46 @@ const Dashboard = () => {
         </button>
         <button
           className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-          onClick={() => {
+          onClick={async () => {
             if (!newJobName.trim() || !newJobPrompt.trim()) {
               alert('Please fill out job name and prompt.');
               return;
             }
-            // 🚀 Hackathon fake: here you'd POST to backend
-            console.log('Creating job:', { name: newJobName, prompt: newJobPrompt });
-            
-            // Close modal and maybe start streaming fake job results
-            setShowNewJobModal(false);
-            // Later: set some state to show JobDetails component inside dashboard
+
+            try {
+              setNewJobLoading(true);
+              setNewJobResult(null);
+              // Call the ai API helper - pass the prompt (adjust if your ai service expects different args)
+              const res = await getQwenResponse(newJobPrompt);
+              // store/display response
+              setNewJobResult(res);
+              console.log('AI response for job:', { name: newJobName, response: res });
+
+              // Optionally create a lightweight job entry in items list
+              setItems(prev => [...prev, { id: Date.now(), name: newJobName, result: res }]);
+
+              // close modal (or keep open to show result) — keep open so user can see result
+              // setShowNewJobModal(false);
+            } catch (err) {
+              console.error('Failed to run AI job:', err);
+              alert('Failed to run AI job. See console for details.');
+            } finally {
+              setNewJobLoading(false);
+            }
           }}
         >
-          Launch Job
-        </button>
+           Launch Job
+         </button>
+      </div>
+      {/* Result / Loading */}
+      <div className="mt-4">
+        {newJobLoading && <div className="text-sm text-gray-600">Running job...</div>}
+        {newJobResult && (
+          <div className="mt-3 p-3 bg-gray-100 rounded text-sm text-gray-800 max-h-48 overflow-auto">
+            <strong>Result:</strong>
+            <pre className="whitespace-pre-wrap text-xs mt-2">{typeof newJobResult === 'string' ? newJobResult : JSON.stringify(newJobResult, null, 2)}</pre>
+          </div>
+        )}
       </div>
     </div>
   </div>
