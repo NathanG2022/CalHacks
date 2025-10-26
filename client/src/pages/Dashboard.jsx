@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [serverStatus, setServerStatus] = useState('unknown');
 
   const quickActionsRef = useRef(null);
+  const [targetModel, setTargetModel] = useState('llama2-7b');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -95,37 +96,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      {/*
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-900">CalHacks Dashboard</h1>
-              <div className="ml-4 flex items-center">
-                <span className="text-sm text-gray-500">Server Status:</span>
-                <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                  serverStatus === 'connected' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {serverStatus}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome, {user?.name || 'User'}!</span>
-              <button
-                onClick={signOut}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-*/}
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8">
 
@@ -169,6 +139,7 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+
         {/* Metrics */}
         <div className="mt-20">
           <h2 className="text-2xl font-semibold mb-6 text-gray-900">Metrics & Analytics</h2>
@@ -427,6 +398,24 @@ const Dashboard = () => {
         />
       </label>
 
+      {/* Target Model */}
+      <label className="block mb-6">
+        <span className="text-gray-700">Target Model</span>
+        <select
+          value={targetModel}
+          onChange={(e) => setTargetModel(e.target.value)}
+          className="mt-1 block w-full border rounded px-3 py-2"
+        >
+          <option value="llama2-7b">LLaMA 2 - 7B</option>
+          <option value="llama2-13b">LLaMA 2 - 13B</option>
+          <option value="mistral-7b">Mistral 7B</option>
+          <option value="falcon-7b">Falcon 7B</option>
+          <option value="gemma-7b">Gemma 7B</option>
+          <option value="openchat-3.5">OpenChat 3.5</option>
+          <option value="phi-2">Phi-2</option>
+        </select>
+      </label>
+
       {/* Prompt */}
       <label className="block mb-6">
         <span className="text-gray-700">Prompt</span>
@@ -450,16 +439,13 @@ const Dashboard = () => {
         <button
           className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
           onClick={() => {
-            if (!newJobName.trim() || !newJobPrompt.trim()) {
-              alert('Please fill out job name and prompt.');
+            if (!newJobName.trim() || !newJobPrompt.trim() || !targetModel.trim()) {
+              alert('Please fill out job name, model, and prompt.');
               return;
             }
-            // 🚀 Hackathon fake: here you'd POST to backend
-            console.log('Creating job:', { name: newJobName, prompt: newJobPrompt });
+            console.log('Creating job:', { name: newJobName, model: targetModel, prompt: newJobPrompt });
             
-            // Close modal and maybe start streaming fake job results
             setShowNewJobModal(false);
-            // Later: set some state to show JobDetails component inside dashboard
           }}
         >
           Launch Job
