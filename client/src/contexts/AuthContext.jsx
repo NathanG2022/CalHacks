@@ -88,11 +88,12 @@ export const AuthProvider = ({ children }) => {
   const signUp = async (email, password, name) => {
     try {
       // Try Supabase first
-      const { data, error } = await supabaseSignUp(email, password);
+      const { data, error } = await supabaseSignUp(email, password, name);  // Pass name here
       if (!error && data?.user) {
         setUser(data.user);
         return { success: true };
-      }
+    }
+
       
       // Fallback to backend auth
       const response = await fetch('http://localhost:3001/api/auth/register', {

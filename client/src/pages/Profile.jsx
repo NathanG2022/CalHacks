@@ -14,7 +14,7 @@ const Profile = () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <p className="mt-1 text-sm text-gray-900">{user?.name || 'Not available'}</p>
+                  <p className="mt-1 text-sm text-gray-900">{user?.user_metadata?.name || 'Not available'}</p>
                 </div>
                 
                 <div>
