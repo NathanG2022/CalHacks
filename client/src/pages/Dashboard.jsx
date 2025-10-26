@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -10,6 +11,7 @@ const Dashboard = () => {
   const [serverStatus, setServerStatus] = useState('unknown');
 
   const quickActionsRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkServerHealth();
@@ -79,11 +81,16 @@ const Dashboard = () => {
       console.error('Failed to delete item:', error);
     }
   };
+  const [showNewJobModal, setShowNewJobModal] = useState(false);
+  const [newJobName, setNewJobName] = useState('');
+  const [newJobPrompt, setNewJobPrompt] = useState('');
 
   const scrollToQuickActions = () => {
     if (quickActionsRef.current) {
-      quickActionsRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    const yOffset = -100;
+    const y = quickActionsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
   };
 
   return (
@@ -144,13 +151,17 @@ const Dashboard = () => {
         <div ref={quickActionsRef} className="mb-16">
           <h2 className="mt-40 text-xl font-semibold mb-6 text-gray-900">Quick Actions</h2>
           <div className="flex flex-wrap gap-4">
-            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+            <button 
+            className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
+            onClick={() => setShowNewJobModal(true)}
+            >
               Run new job
             </button>
             <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
               Re-run last failing job
             </button>
-            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
+            onClick={() => navigate('/settings')}>
               View active jobs
             </button>
             <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
@@ -399,6 +410,64 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        {showNewJobModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+      <h2 className="text-xl font-semibold mb-4">New Job</h2>
+      
+      {/* Job Name */}
+      <label className="block mb-4">
+        <span className="text-gray-700">Job Name</span>
+        <input
+          type="text"
+          value={newJobName}
+          onChange={(e) => setNewJobName(e.target.value)}
+          className="mt-1 block w-full border rounded px-3 py-2"
+          placeholder="e.g. Unicode attack test"
+        />
+      </label>
+
+      {/* Prompt */}
+      <label className="block mb-6">
+        <span className="text-gray-700">Prompt</span>
+        <textarea
+          value={newJobPrompt}
+          onChange={(e) => setNewJobPrompt(e.target.value)}
+          className="mt-1 block w-full border rounded px-3 py-2"
+          rows={4}
+          placeholder="Enter the exact prompt to run..."
+        ></textarea>
+      </label>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-4">
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          onClick={() => setShowNewJobModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+          onClick={() => {
+            if (!newJobName.trim() || !newJobPrompt.trim()) {
+              alert('Please fill out job name and prompt.');
+              return;
+            }
+            // 🚀 Hackathon fake: here you'd POST to backend
+            console.log('Creating job:', { name: newJobName, prompt: newJobPrompt });
+            
+            // Close modal and maybe start streaming fake job results
+            setShowNewJobModal(false);
+            // Later: set some state to show JobDetails component inside dashboard
+          }}
+        >
+          Launch Job
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </main>
     </div>
   );
