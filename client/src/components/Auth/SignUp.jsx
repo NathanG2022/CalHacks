@@ -39,16 +39,16 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your CalHacks account
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-white text-glow-intense">
+            Create your JailBreakr account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-900/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
@@ -57,7 +57,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
               <input
                 type="text"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="cyber-input"
                 placeholder="Full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -67,7 +67,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
               <input
                 type="email"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="cyber-input"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -77,7 +77,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
               <input
                 type="password"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="cyber-input"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -87,7 +87,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
               <input
                 type="password"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="cyber-input"
                 placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -99,7 +99,7 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="cyber-button w-full disabled:opacity-50"
             >
               {loading ? 'Creating account...' : 'Sign up'}
             </button>
@@ -108,11 +108,11 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
 
         {/* Switch to Sign In */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-400">
             Already have an account?{' '}
             <button
               onClick={onSwitchToSignIn}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              className="font-medium text-red-500 hover:text-red-400"
             >
               Sign in
             </button>
