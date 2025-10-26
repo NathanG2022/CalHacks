@@ -44,7 +44,7 @@ function AppContent() {
                 </Link>
                 <Link
                   to="/enhanced-ai"
-                  className="border-transparent text-gray-900 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-1 border-b-2 font-medium text-sm"
+                  className="border-transparent text-gray-300 hover:text-white hover:border-red-600 whitespace-nowrap py-6 px-1 border-b-2 font-medium text-sm transition-colors"
                 >
                   Enhanced AI
                 </Link>
