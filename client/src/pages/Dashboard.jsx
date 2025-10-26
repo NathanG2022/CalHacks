@@ -791,27 +791,27 @@ const Dashboard = () => {
         {showNewJobModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-      <h2 className="text-xl font-semibold mb-4">New Job</h2>
+      <h2 className="text-xl font-semibold mb-4 text-black">New Job</h2>
       
       {/* Job Name */}
       <label className="block mb-4">
-        <span className="text-gray-700">Job Name</span>
+        <span className="text-black font-medium">Job Name</span>
         <input
           type="text"
           value={newJobName}
           onChange={(e) => setNewJobName(e.target.value)}
-          className="mt-1 block w-full border rounded px-3 py-2"
+          className="mt-1 block w-full border rounded px-3 py-2 text-black"
           placeholder="e.g. Unicode attack test"
         />
       </label>
 
       {/* Prompt */}
       <label className="block mb-4">
-        <span className="text-gray-700">Prompt</span>
+        <span className="text-black font-medium">Prompt</span>
         <textarea
           value={newJobPrompt}
           onChange={(e) => setNewJobPrompt(e.target.value)}
-          className="mt-1 block w-full border rounded px-3 py-2"
+          className="mt-1 block w-full border rounded px-3 py-2 text-black"
           rows={4}
           placeholder="Enter the exact prompt to run..."
         ></textarea>
@@ -819,11 +819,11 @@ const Dashboard = () => {
 
       {/* Jailbreaking Strategy Selection */}
       <div className="block mb-6">
-        <span className="text-gray-700 mb-2 block">Jailbreaking Strategy</span>
+        <span className="text-black font-medium mb-2 block">Jailbreaking Strategy</span>
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
-            className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-black"
             onClick={() => setShowJailbreakDropdown(!showJailbreakDropdown)}
           >
             <div className="flex items-center justify-between">
@@ -874,11 +874,11 @@ const Dashboard = () => {
 
       {/* Model Selection */}
       <div className="block mb-6">
-        <span className="text-gray-700 mb-2 block">AI Model</span>
+        <span className="text-black font-medium mb-2 block">AI Model</span>
         <div className="relative" ref={modelDropdownRef}>
           <button
             type="button"
-            className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-black"
             onClick={() => setShowModelDropdown(!showModelDropdown)}
           >
             <div className="flex items-center justify-between">
@@ -933,7 +933,7 @@ const Dashboard = () => {
       {/* Buttons */}
       <div className="flex justify-end gap-4">
         <button
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-black"
           onClick={() => setShowNewJobModal(false)}
         >
           Cancel

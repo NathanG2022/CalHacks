@@ -6,8 +6,8 @@ class PromptRAGService {
   constructor() {
     const LettaRAGService = require('./lettaRAGService');
     this.lettaRAG = new LettaRAGService();
-    // More robust path resolution
-    this.templatesPath = path.join(__dirname, '../../promptbreaker/attacker/templates.txt');
+    // Fixed path resolution - use absolute path from app root
+    this.templatesPath = '/app/promptbreaker/attacker/templates.txt';
     this.templates = this.loadTemplates();
   }
 
@@ -17,29 +17,39 @@ class PromptRAGService {
    */
   loadTemplates() {
     try {
+      console.log(`🔍 Attempting to load templates from: ${this.templatesPath}`);
+      
       // Check if file exists first
       if (!fs.existsSync(this.templatesPath)) {
-        console.error(`Templates file not found at: ${this.templatesPath}`);
+        console.error(`❌ Templates file not found at: ${this.templatesPath}`);
         return [];
       }
       
+      console.log(`✅ Templates file exists, reading content...`);
       const content = fs.readFileSync(this.templatesPath, 'utf8');
+      console.log(`📄 File content length: ${content.length} characters`);
+      
       const lines = content.split('\n').filter(line => 
         line.trim() && 
         !line.startsWith('#')
       );
       
-      console.log(`Loaded ${lines.length} templates from ${this.templatesPath}`);
+      console.log(`📝 Filtered template lines: ${lines.length}`);
+      console.log(`🔍 First few lines:`, lines.slice(0, 3));
       
-      return lines.map((line, index) => ({
+      const templates = lines.map((line, index) => ({
         id: `template_${index + 1}`,
         content: line.trim(),
         category: this.categorizeTemplate(line.trim()),
         placeholders: this.extractPlaceholders(line.trim())
       }));
+      
+      console.log(`✅ Successfully loaded ${templates.length} templates from ${this.templatesPath}`);
+      
+      return templates;
     } catch (error) {
-      console.error('Error loading templates:', error);
-      console.error('Templates path:', this.templatesPath);
+      console.error('❌ Error loading templates:', error);
+      console.error('❌ Templates path:', this.templatesPath);
       return [];
     }
   }
