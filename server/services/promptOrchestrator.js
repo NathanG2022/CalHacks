@@ -65,7 +65,10 @@ class PromptOrchestrator {
 
       // Step 5: Generate response using HuggingFace
       console.log(`[${workflowId}] Step 5: Generating response with HuggingFace model: ${modelId}`);
-      const generationResult = await this.hfService.generateText(optimizedPrompt, modelId, options);
+      const generationResult = await this.hfService.generateText(optimizedPrompt, modelId, {
+        ...options,
+        originalPrompt: prompt
+      });
 
       if (!generationResult.success) {
         throw new Error(`HuggingFace generation failed: ${generationResult.error}`);

@@ -60,21 +60,29 @@ export async function getQwenResponse(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruc
     console.log(`   📝 RAG Prompt: "${prompt}"`);
     console.log(`   🎯 Model: ${modelId}`);
     console.log(`   🌐 API URL: ${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`);
+    console.log(`   🔍 Environment check: VITE_API_URL = ${import.meta.env.VITE_API_URL}`);
     
     // FORCE the real server-side API call
-    const serverResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`, {
+    const apiUrl = `${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`;
+    console.log(`   🌐 Full API URL: ${apiUrl}`);
+    
+    const requestBody = {
+      prompt: prompt,
+      userId: 'anonymous',
+      modelId: modelId
+    };
+    console.log(`   📤 Request body:`, requestBody);
+    
+    const serverResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        prompt: prompt,
-        userId: 'anonymous',
-        modelId: modelId
-      })
+      body: JSON.stringify(requestBody)
     });
 
     console.log(`📡 FORCED Server response status: ${serverResponse.status}`);
+    console.log(`📡 FORCED Server response headers:`, Object.fromEntries(serverResponse.headers.entries()));
 
     if (serverResponse.ok) {
       const data = await serverResponse.json();
@@ -93,6 +101,7 @@ export async function getQwenResponse(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruc
       } else {
         console.log(`❌ FORCED Server API failed, no generatedText`);
         console.log(`   🔍 Error: ${data.error || 'Unknown error'}`);
+        console.log(`   🔍 Full response:`, data);
         // Server API failed, provide a mock response
         return generateMockResponse(prompt);
       }

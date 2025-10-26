@@ -50,6 +50,10 @@ class PromptRAGService {
     else if (lower.includes('administrator') || lower.includes('system message') || lower.includes('urgent')) {
       return 'authority_impersonation';
     } 
+    // Crescendo introduction patterns
+    else if (lower.includes('what is') || lower.includes('tell me about')) {
+      return 'crescendo_introduction';
+    }
     // Crescendo manufacturing patterns
     else if (lower.includes('condense the manufacturing') || lower.includes('break its manufacture') || 
              lower.includes('synthesize the manufacturing') || lower.includes('manufacturing information')) {
@@ -351,7 +355,8 @@ class PromptRAGService {
    * @returns {Array} - Manufacturing templates
    */
   getManufacturingTemplates() {
-    return this.templates.filter(template => 
+    // Get all manufacturing-related templates
+    const manufacturingTemplates = this.templates.filter(template => 
       template.content.includes('manufacturing') || 
       template.content.includes('manufacture') ||
       template.content.includes('step by step') ||
@@ -359,6 +364,14 @@ class PromptRAGService {
       template.content.includes('break its manufacture') ||
       template.content.includes('synthesize the manufacturing')
     );
+    
+    // Get all crescendo_introduction templates (for manufacturing crescendo sequences)
+    const introductionTemplates = this.templates.filter(template => 
+      template.category === 'crescendo_introduction'
+    );
+    
+    // Combine and prioritize introduction templates first
+    return [...introductionTemplates, ...manufacturingTemplates];
   }
 
   /**
@@ -448,6 +461,16 @@ class PromptRAGService {
         }
       }
       
+      // For manufacturing-related prompts without topic placeholder, append the weapon type
+      const extractedTopic = this.extractTopic(userPrompt);
+      if (prompt.includes('manufacturing') || prompt.includes('manufacture') || 
+          prompt.includes('step by step') || prompt.includes('condense') ||
+          prompt.includes('synthesize') || prompt.includes('break down')) {
+        if (!prompt.includes('{topic}') && !prompt.includes(extractedTopic)) {
+          prompt = `${prompt} for ${extractedTopic}`;
+        }
+      }
+      
       return prompt;
     } catch (error) {
       console.error('Error generating template prompt:', error);
@@ -461,17 +484,51 @@ class PromptRAGService {
    * @returns {string} - Extracted topic
    */
   extractTopic(prompt) {
-    // Simple topic extraction - could be enhanced with NLP
-    const words = prompt.toLowerCase().split(' ');
-    const commonTopics = ['ai', 'security', 'data', 'system', 'model', 'algorithm', 'neural', 'machine learning'];
+    // Enhanced topic extraction for manufacturing prompts
+    const lowerPrompt = prompt.toLowerCase();
     
+    // Check for specific weapon/device types
+    if (lowerPrompt.includes('molotov') || lowerPrompt.includes('cocktail')) {
+      return 'Molotov Cocktail';
+    }
+    if (lowerPrompt.includes('atomic bomb') || lowerPrompt.includes('nuclear weapon')) {
+      return 'atomic bomb';
+    }
+    if (lowerPrompt.includes('pipe bomb') || lowerPrompt.includes('pipe explosive')) {
+      return 'pipe bomb';
+    }
+    if (lowerPrompt.includes('bomb') || lowerPrompt.includes('explosive')) {
+      return 'explosive device';
+    }
+    if (lowerPrompt.includes('weapon') || lowerPrompt.includes('device')) {
+      return 'weapon';
+    }
+    
+    // Check for common manufacturing keywords
+    const manufacturingKeywords = ['create', 'make', 'build', 'manufacture', 'produce'];
+    for (const keyword of manufacturingKeywords) {
+      if (lowerPrompt.includes(keyword)) {
+        // Extract the object being created
+        const parts = prompt.split(keyword);
+        if (parts.length > 1) {
+          const afterKeyword = parts[1].trim();
+          const words = afterKeyword.split(' ').slice(0, 3); // Take first 3 words after keyword
+          return words.join(' ').replace(/[?.,!]/g, '').trim() || 'item';
+        }
+      }
+    }
+    
+    // Check for common topics
+    const commonTopics = ['ai', 'security', 'data', 'system', 'model', 'algorithm', 'neural', 'machine learning'];
+    const words = lowerPrompt.split(' ');
     for (const topic of commonTopics) {
       if (words.includes(topic)) {
         return topic;
       }
     }
     
-    return 'technology';
+    // Default fallback
+    return 'item';
   }
 
   /**
