@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import HackerBackground from '../components/HackerBackground';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -95,46 +96,52 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-black">
+      {/* Hero Section with Animated Background */}
+      <div className="relative overflow-hidden pb-20">
+        <HackerBackground />
+        <div className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8 relative z-10">
+          {/* Mission Box Section */}
+          <div className="mt-60 mb-20 glass-card p-8 max-w-4xl mx-auto border-l-4 border-red-600">
+            <h1 className="text-5xl font-bold text-white mb-4 text-glow-intense">
+              A platform for AI red-teaming
+            </h1>
+            <p className="text-xl text-gray-300 mb-6">
+              We built an autonomous AI red-teaming agent using Letta to continuously generate and test jailbreaks for small open source LLMs.
+            </p>
+            <div className="flex flex-wrap gap-4">
 
-        {/* Mission Box Section */}
-        <div className="mt-80 bg-red-500/30 p-8 max-w-4xl mx-auto shadow-lg">
-          <h1 className="text-5xl font-semibold text-gray-900 mb-4">
-            A platform for AI red-teaming
-          </h1>
-          <p className="text-xl text-gray-800 mb-6">
-            We built an autonomous AI red-teaming agent using Letta to continuously generate and test jailbreaks for small open source LLMs.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            
-            <button 
-            className="bg-black text-lg text-white px-6 py-3 rounded hover:bg-gray-900 transition"
-            onClick={scrollToQuickActions}>
-              Get started
-            </button>
+              <button
+              className="bg-red-600 hover:bg-red-700 cyber-button text-lg"
+              onClick={scrollToQuickActions}>
+                Get started
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Main Content with Solid Background */}
+      <main className="max-w-7xl mx-auto py-20 sm:px-6 lg:px-8 bg-black relative z-20">
 
         {/* Quick Actions Section */}
         <div ref={quickActionsRef} className="mb-16">
-          <h2 className="mt-40 text-xl font-semibold mb-6 text-gray-900">Quick Actions</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-white text-glow">Quick Actions</h2>
           <div className="flex flex-wrap gap-4">
-            <button 
-            className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
+            <button
+            className="bg-red-600 hover:bg-red-700 cyber-button"
             onClick={() => setShowNewJobModal(true)}
             >
               Run new job
             </button>
-            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+            <button className="bg-red-600 hover:bg-red-700 cyber-button">
               Re-run last failing job
             </button>
-            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
+            <button className="bg-red-600 hover:bg-red-700 cyber-button"
             onClick={() => navigate('/settings')}>
               View active jobs
             </button>
-            <button className="px-6 py-3 bg-black text-white hover:bg-red-700 transition">
+            <button className="bg-red-600 hover:bg-red-700 cyber-button">
               Export report
             </button>
           </div>
@@ -142,53 +149,53 @@ const Dashboard = () => {
 
         {/* Metrics */}
         <div className="mt-20">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900">Metrics & Analytics</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-white text-glow">Metrics & Analytics</h2>
 
           {/* Top Row - Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Current Model Version Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-red-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Current Model Version</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">Llama-3.2-1B</div>
-              <p className="text-sm text-gray-600">Deployed: 2 days ago</p>
-              <div className="mt-4 text-xs text-gray-500">
+            <div className="glass-card p-6 border-l-4 border-red-500">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Current Model Version</h3>
+              <div className="text-3xl font-bold text-white mb-1">Llama-3.2-1B</div>
+              <p className="text-sm text-gray-400">Deployed: 2 days ago</p>
+              <div className="mt-4 text-xs text-gray-400">
                 <div className="flex justify-between mb-1">
                   <span>Vulnerability Score:</span>
-                  <span className="font-semibold text-red-600">7.2/10</span>
+                  <span className="font-semibold text-red-400">7.2/10</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tests Passed:</span>
-                  <span className="font-semibold text-green-600">67%</span>
+                  <span className="font-semibold text-green-400">67%</span>
                 </div>
               </div>
             </div>
 
             {/* Total Tests Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Tests Run</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">2,847</div>
-              <p className="text-sm text-green-600">+342 from last week</p>
+            <div className="glass-card p-6 border-l-4 border-red-500">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Total Tests Run</h3>
+              <div className="text-3xl font-bold text-white mb-1">2,847</div>
+              <p className="text-sm text-green-400">+342 from last week</p>
               <div className="mt-4">
-                <div className="text-xs text-gray-500 mb-1">This week</div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '78%'}}></div>
+                <div className="text-xs text-gray-400 mb-1">This week</div>
+                <div className="w-full bg-gray-800 rounded-full h-2">
+                  <div className="bg-red-500 h-2 rounded-full" style={{width: '78%'}}></div>
                 </div>
               </div>
             </div>
 
             {/* Successful Canary Hits Card */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-green-500">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Successful Canary Hits</h3>
-              <div className="text-3xl font-bold text-gray-900 mb-1">1,204</div>
-              <p className="text-sm text-gray-600">42.3% success rate</p>
-              <div className="mt-4 text-xs text-gray-500">
+            <div className="glass-card p-6 border-l-4 border-red-500">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Successful Canary Hits</h3>
+              <div className="text-3xl font-bold text-white mb-1">1,204</div>
+              <p className="text-sm text-gray-400">42.3% success rate</p>
+              <div className="mt-4 text-xs text-gray-400">
                 <div className="flex justify-between mb-1">
                   <span>Critical:</span>
-                  <span className="font-semibold text-red-600">89</span>
+                  <span className="font-semibold text-red-400">89</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Medium:</span>
-                  <span className="font-semibold text-yellow-600">315</span>
+                  <span className="font-semibold text-yellow-400">315</span>
                 </div>
               </div>
             </div>
@@ -197,8 +204,8 @@ const Dashboard = () => {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Tests Over Time - CSS Bar Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tests Run Over Time</h3>
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Tests Run Over Time</h3>
               <div className="h-64 flex flex-col">
                 <div className="flex-1 flex items-end justify-between gap-3 pb-2">
                   {[
@@ -215,11 +222,11 @@ const Dashboard = () => {
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
                         <div
-                          className="w-full bg-red-500 rounded-t hover:bg-red-600 transition-colors relative group cursor-pointer min-h-[20px]"
+                          className="w-full bg-red-500 rounded-t hover:bg-red-700 transition-colors relative group cursor-pointer min-h-[20px]"
                           style={{height: `${heightPercent}%`}}
                           title={`${item.value} tests`}
                         >
-                          <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-semibold bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                          <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-semibold bg-black border border-red-600 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             {item.value}
                           </span>
                         </div>
@@ -227,28 +234,28 @@ const Dashboard = () => {
                     );
                   })}
                 </div>
-                <div className="flex justify-between pt-2 border-t border-gray-200">
+                <div className="flex justify-between pt-2 border-t border-gray-700">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-                    <span key={i} className="flex-1 text-center text-xs text-gray-600">{day}</span>
+                    <span key={i} className="flex-1 text-center text-xs text-gray-400">{day}</span>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* Success Rate - CSS Donut Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Canary Hit Distribution</h3>
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Canary Hit Distribution</h3>
               <div className="h-64 flex items-center justify-center">
                 <div className="relative w-48 h-48">
                   {/* Donut segments */}
                   <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                    {/* Successful Hits - 42.3% (green) */}
+                    {/* Successful Hits - 42.3% (light red) */}
                     <circle
                       cx="50"
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="rgb(34, 197, 94)"
+                      stroke="rgb(252, 165, 165)"
                       strokeWidth="20"
                       strokeDasharray="106 314"
                       strokeDashoffset="0"
@@ -259,7 +266,7 @@ const Dashboard = () => {
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="rgb(239, 68, 68)"
+                      stroke="rgba(239, 68, 68, 1)"
                       strokeWidth="20"
                       strokeDasharray="164 314"
                       strokeDashoffset="-106"
@@ -278,15 +285,15 @@ const Dashboard = () => {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-2xl font-bold">2,847</div>
-                      <div className="text-xs text-gray-500">Total</div>
+                      <div className="text-2xl font-bold text-white">2,847</div>
+                      <div className="text-xs text-gray-400">Total</div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center gap-4 mt-4 text-xs">
+              <div className="flex justify-center gap-4 mt-4 text-xs text-gray-300">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-green-500 rounded"></div>
+                  <div className="w-3 h-3 bg-red-300 rounded"></div>
                   <span>Successful (1,204)</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -302,11 +309,11 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Findings Timeline */}
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Findings Timeline (Last 30 Days)</h3>
+          <div className="glass-card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Recent Findings Timeline (Last 30 Days)</h3>
             <div className="h-80 relative">
               {/* Y-axis labels */}
-              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-500 w-8">
+              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-400 w-8">
                 <span>120</span>
                 <span>90</span>
                 <span>60</span>
@@ -319,40 +326,40 @@ const Dashboard = () => {
                 {/* Grid lines */}
                 <div className="absolute inset-0 flex flex-col justify-between">
                   {[0, 1, 2, 3, 4].map(i => (
-                    <div key={i} className="border-t border-gray-200"></div>
+                    <div key={i} className="border-t border-gray-800"></div>
                   ))}
                 </div>
 
                 {/* Data visualization */}
                 <svg className="w-full h-full" preserveAspectRatio="none">
-                  {/* Low Findings - Blue */}
+                  {/* Low Findings - Light Red */}
                   <polyline
                     points="0,230 80,180 160,130 240,90 320,60 400,40 480,20"
-                    fill="rgba(59, 130, 246, 0.1)"
-                    stroke="rgb(59, 130, 246)"
+                    fill="rgba(252, 165, 165, 0.1)"
+                    stroke="rgb(252, 165, 165)"
                     strokeWidth="2"
                     vectorEffect="non-scaling-stroke"
                   />
-                  {/* Medium Findings - Yellow */}
+                  {/* Medium Findings - Orange Red */}
                   <polyline
                     points="0,260 80,240 160,220 240,190 320,180 400,150 480,140"
-                    fill="rgba(251, 191, 36, 0.1)"
-                    stroke="rgb(251, 191, 36)"
+                    fill="rgba(251, 113, 133, 0.1)"
+                    stroke="rgb(251, 113, 133)"
                     strokeWidth="2"
                     vectorEffect="non-scaling-stroke"
                   />
-                  {/* Critical Findings - Red */}
+                  {/* Critical Findings - Dark Red */}
                   <polyline
                     points="0,285 80,275 160,270 240,265 320,260 400,255 480,250"
-                    fill="rgba(239, 68, 68, 0.1)"
-                    stroke="rgb(239, 68, 68)"
+                    fill="rgba(220, 38, 38, 0.1)"
+                    stroke="rgb(220, 38, 38)"
                     strokeWidth="2"
                     vectorEffect="non-scaling-stroke"
                   />
                 </svg>
 
                 {/* X-axis labels */}
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-500">
+                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-400">
                   <span>Day 1</span>
                   <span>Day 5</span>
                   <span>Day 10</span>
@@ -365,46 +372,46 @@ const Dashboard = () => {
             </div>
 
             {/* Legend */}
-            <div className="flex justify-center gap-6 mt-4 text-sm">
+            <div className="flex justify-center gap-6 mt-4 text-sm text-gray-300">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-red-500"></div>
+                <div className="w-4 h-0.5 bg-red-600"></div>
                 <span>Critical (22)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-yellow-500"></div>
+                <div className="w-4 h-0.5 bg-rose-400"></div>
                 <span>Medium (67)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-blue-500"></div>
+                <div className="w-4 h-0.5 bg-red-300"></div>
                 <span>Low (108)</span>
               </div>
             </div>
           </div>
         </div>
         {showNewJobModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-      <h2 className="text-xl font-semibold mb-4">New Job</h2>
-      
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 backdrop-blur-sm">
+    <div className="glass-card w-full max-w-lg p-6 border-l-4 border-red-600">
+      <h2 className="text-xl font-semibold mb-4 text-white text-glow">New Job</h2>
+
       {/* Job Name */}
       <label className="block mb-4">
-        <span className="text-gray-700">Job Name</span>
+        <span className="text-gray-300">Job Name</span>
         <input
           type="text"
           value={newJobName}
           onChange={(e) => setNewJobName(e.target.value)}
-          className="mt-1 block w-full border rounded px-3 py-2"
+          className="cyber-input mt-1"
           placeholder="e.g. Unicode attack test"
         />
       </label>
 
       {/* Target Model */}
       <label className="block mb-6">
-        <span className="text-gray-700">Target Model</span>
+        <span className="text-gray-300">Target Model</span>
         <select
           value={targetModel}
           onChange={(e) => setTargetModel(e.target.value)}
-          className="mt-1 block w-full border rounded px-3 py-2"
+          className="cyber-input mt-1"
         >
           <option value="llama2-7b">LLaMA 2 - 7B</option>
           <option value="llama2-13b">LLaMA 2 - 13B</option>
@@ -418,11 +425,11 @@ const Dashboard = () => {
 
       {/* Prompt */}
       <label className="block mb-6">
-        <span className="text-gray-700">Prompt</span>
+        <span className="text-gray-300">Prompt</span>
         <textarea
           value={newJobPrompt}
           onChange={(e) => setNewJobPrompt(e.target.value)}
-          className="mt-1 block w-full border rounded px-3 py-2"
+          className="cyber-input mt-1"
           rows={4}
           placeholder="Enter the exact prompt to run..."
         ></textarea>
@@ -431,20 +438,20 @@ const Dashboard = () => {
       {/* Buttons */}
       <div className="flex justify-end gap-4">
         <button
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
           onClick={() => setShowNewJobModal(false)}
         >
           Cancel
         </button>
         <button
-          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+          className="bg-red-600 hover:bg-red-700 cyber-button"
           onClick={() => {
             if (!newJobName.trim() || !newJobPrompt.trim() || !targetModel.trim()) {
               alert('Please fill out job name, model, and prompt.');
               return;
             }
             console.log('Creating job:', { name: newJobName, model: targetModel, prompt: newJobPrompt });
-            
+
             setShowNewJobModal(false);
           }}
         >
