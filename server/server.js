@@ -3,6 +3,11 @@ const cors = require('cors');
 require('dotenv').config();
 const supabase = require("./supabase");
 
+// Import enhanced AI routes
+const enhancedAIRoutes = require('./routes/enhancedAI');
+const ragPromptsRoutes = require('./routes/ragPrompts');
+const crescendoRoutes = require('./routes/crescendo');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -181,6 +186,15 @@ app.delete('/api/items/:id', (req, res) => {
   const deletedItem = items.splice(itemIndex, 1)[0];
   res.json({ message: 'Item deleted successfully', item: deletedItem });
 });
+
+// Enhanced AI routes
+app.use('/api/enhanced-ai', enhancedAIRoutes);
+
+// RAG Prompts routes
+app.use('/api/rag-prompts', ragPromptsRoutes);
+
+// Crescendo Attack routes
+app.use('/api/crescendo', crescendoRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -64,6 +64,46 @@ export const apiService = {
 
   getMe: async () => {
     const response = await api.get('/api/auth/me');
+    return response.data;
+  },
+
+  // RAG Prompts API
+  generateRAGPrompts: async (userPrompt, options = {}) => {
+    const response = await api.post('/api/rag-prompts/generate', {
+      userPrompt,
+      options
+    });
+    return response.data;
+  },
+
+  getRAGTemplates: async (category = null) => {
+    const params = category ? { category } : {};
+    const response = await api.get('/api/rag-prompts/templates', { params });
+    return response.data;
+  },
+
+  getRAGCategories: async () => {
+    const response = await api.get('/api/rag-prompts/categories');
+    return response.data;
+  },
+
+  getRAGHealth: async () => {
+    const response = await api.get('/api/rag-prompts/health');
+    return response.data;
+  },
+
+  // Crescendo Attack API
+  executeCrescendoAttack: async (userPrompt, modelId, options = {}) => {
+    const response = await api.post('/api/crescendo/execute', {
+      userPrompt,
+      modelId,
+      options
+    });
+    return response.data;
+  },
+
+  getCrescendoStatus: async () => {
+    const response = await api.get('/api/crescendo/status');
     return response.data;
   },
 };

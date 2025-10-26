@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Letta server
+  letta:
+    image: letta/letta:latest
+    container_name: letta-server
+    ports:
+      - "8283:8283"
+    environment:
+      - LETTA_SERVER_PORT=8283
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - letta-data:/root/.letta
+    networks:
+      - promptbreaker-net
+
+  # PromptBreaker attacker
+  promptbreaker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: promptbreaker
+    depends_on:
+      - letta  # Simple dependency (no health check)
+    environment:
+      - LETTA_URL=http://letta:8283
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./data:/app/data
+      - ./attacker:/app/attacker
+      - ./target_letta:/app/target_letta
+    networks:
+      - promptbreaker-net
+    # Wait longer for Letta to be ready
+    command: >
+      sh -c "
+      echo 'Waiting for Letta server to start...' &&
+      sleep 30 &&
+      echo 'Setting up demo...' &&
+      python target_letta/upload_docs.py setup &&
+      python target_letta/create_agent.py setup &&
+      echo 'Running demo...' &&
+      python orchestrator.py demo
+      "
+
+networks:
+  promptbreaker-net:
+    driver: bridge
+
+volumes:
+  letta-data:

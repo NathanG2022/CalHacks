@@ -60,3 +60,5 @@ console.log('1. Edit client/.env.local with your Supabase credentials');
 console.log('2. Get your Supabase URL and anon key from https://supabase.com');
 console.log('3. Restart the development server');
 console.log('\n🚀 Run: npm run dev');
+
+

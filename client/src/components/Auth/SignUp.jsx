@@ -124,3 +124,5 @@ const SignUp = ({ onSuccess, onSwitchToSignIn }) => {
 };
 
 export default SignUp;
+
+

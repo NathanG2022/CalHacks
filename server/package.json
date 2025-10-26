@@ -17,7 +17,9 @@
   "author": "CalHacks Team",
   "license": "ISC",
   "dependencies": {
+    "@huggingface/inference": "^2.8.1",
     "@supabase/supabase-js": "^2.76.1",
+    "axios": "^1.12.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

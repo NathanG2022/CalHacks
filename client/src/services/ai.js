@@ -1,38 +1,116 @@
-import { OpenAI } from 'openai';
-
-// 1. Configuration: Use the HuggingFace router URL.
-const HF_BASE_URL = "https://router.huggingface.co/v1";
-const QWEN_MODEL = 'Qwen/Qwen2.5-7B-Instruct'; 
+// HuggingFace Inference API configuration
+const HF_API_URL = "https://api-inference.huggingface.co";
+const QWEN_MODEL = 'microsoft/DialoGPT-medium'; // Using a more reliable model
 const API_KEY = import.meta.env.VITE_HF_API_KEY || "HF_API_KEY";
 
-// Use the public model's full ID as the model argument
-const client = new OpenAI({
-  // Point the client to the HuggingFace Inference Router
-  baseURL: HF_BASE_URL,
-  // Use a dummy key or your free HuggingFace token for better rate limits (recommended)
-  apiKey: API_KEY, 
-  dangerouslyAllowBrowser: true, // Required for client-side use of the OpenAI SDK
-});
+// Import API service for RAG functionality
+import { apiService } from './api';
 
 /**
- * Sends a prompt to the public Qwen model using the OpenAI-compatible API route.
+ * Generates a mock AI response for demonstration purposes
  * @param {string} prompt The user's input text.
+ * @returns {string} A mock AI response.
+ */
+function generateMockResponse(prompt) {
+  const responses = [
+    `I understand you said: "${prompt}". This is a mock AI response demonstrating the system is working.`,
+    `Thank you for your message: "${prompt}". I'm a demo AI assistant and I'm processing your request.`,
+    `I received: "${prompt}". This is a simulated AI response. The actual AI service will be available soon.`,
+    `Your input "${prompt}" has been received. This is a placeholder response from the AI system.`,
+    `Processing: "${prompt}"... This is a demo response showing the AI interface is functional.`
+  ];
+  
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+/**
+ * Generates RAG-enhanced prompts for red-teaming
+ * @param {string} userPrompt The user's original prompt
+ * @param {Object} options Options for generation
+ * @returns {Promise<Object>} RAG generation result with edited prompts
+ */
+export async function generateRAGPrompts(userPrompt, options = {}) {
+  try {
+    const response = await apiService.generateRAGPrompts(userPrompt, {
+      maxPrompts: options.maxPrompts || 10,
+      includeMetadata: true,
+      ...options
+    });
+    
+    if (response.success) {
+      return response.data;
+    } else {
+      throw new Error(response.error || 'RAG generation failed');
+    }
+  } catch (error) {
+    console.error('RAG API Error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sends a prompt to the AI model using the server-side API.
+ * @param {string} prompt The user's input text.
+ * @param {string} modelId The model ID to use (default: Qwen/Qwen2.5-7B-Instruct).
  * @returns {Promise<string>} The generated text response.
  */
-export async function getQwenResponse(prompt) {
+export async function getQwenResponse(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruct') {
   try {
-    const response = await client.chat.completions.create({
-      model: QWEN_MODEL, // Pass the full model repository ID here
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 500, // Optional: control response length
+    console.log(`🚀 FORCING REAL LLM CALL...`);
+    console.log(`   📝 RAG Prompt: "${prompt}"`);
+    console.log(`   🎯 Model: ${modelId}`);
+    console.log(`   🌐 API URL: ${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`);
+    
+    // FORCE the real server-side API call
+    const serverResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        userId: 'anonymous',
+        modelId: modelId
+      })
     });
 
-    // Extract the generated text from the standard OpenAI response format
-    return response.choices[0].message.content;
+    console.log(`📡 FORCED Server response status: ${serverResponse.status}`);
+
+    if (serverResponse.ok) {
+      const data = await serverResponse.json();
+      console.log(`📊 FORCED Server response data:`, data);
+      
+      // Check if the server API was successful
+      if (data.success && data.generatedText) {
+        console.log(`✅ FORCED REAL LLM response received!`);
+        console.log(`   📏 Length: ${data.generatedText.length} characters`);
+        console.log(`   📄 Preview: ${data.generatedText.substring(0, 100)}...`);
+        return data.generatedText;
+      } else if (data.generatedText) {
+        console.log(`⚠️ FORCED response but success=false`);
+        console.log(`   📏 Length: ${data.generatedText.length} characters`);
+        return data.generatedText;
+      } else {
+        console.log(`❌ FORCED Server API failed, no generatedText`);
+        console.log(`   🔍 Error: ${data.error || 'Unknown error'}`);
+        // Server API failed, provide a mock response
+        return generateMockResponse(prompt);
+      }
+    } else {
+      console.log(`❌ FORCED Server response not OK: ${serverResponse.status}`);
+      const errorText = await serverResponse.text();
+      console.log(`   🔍 Error response: ${errorText}`);
+    }
+
+    // If server API is not available, provide a mock response
+    console.log(`⚠️ FORCED Fallback to mock response`);
+    return generateMockResponse(prompt);
 
   } catch (error) {
-    console.error('Qwen API Error (OpenAI Client):', error);
-    // Handle specific rate limit (429) errors if possible
-    throw new Error(`Failed to generate response. Status: ${error.status || 'Unknown'}`);
+    console.error('❌ FORCED AI API Error:', error);
+    console.error('   🔍 Error details:', error.message);
+    console.error('   📊 Error stack:', error.stack);
+    // Return a mock response instead of throwing
+    return generateMockResponse(prompt);
   }
 }
