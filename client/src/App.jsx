@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SignIn, SignUp } from './components/Auth';
 import LoadingScreen from './components/LoadingScreen';
+import ScrollToTop from './ScrollToTop';
 
 function AppContent() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -62,6 +63,7 @@ function AppContent() {
       </nav>
 
       {/* Main Content */}
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
