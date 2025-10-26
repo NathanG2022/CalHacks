@@ -77,8 +77,6 @@ class HuggingFaceService {
    */
   async generateText(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruct', options = {}) {
     // TEMPORARY: Always use fallback response until HuggingFace API is fixed
-    console.log(`🔄 Using enhanced fallback response for prompt: ${prompt.substring(0, 50)}...`);
-    
     const startTime = Date.now();
     const fallbackResponse = this.generateFallbackResponse(prompt, modelId, options.originalPrompt);
     const responseTime = Date.now() - startTime;

@@ -6,7 +6,8 @@ class PromptRAGService {
   constructor() {
     const LettaRAGService = require('./lettaRAGService');
     this.lettaRAG = new LettaRAGService();
-    this.templatesPath = path.join(__dirname, '../promptbreaker/attacker/templates.txt');
+    // More robust path resolution
+    this.templatesPath = path.join(__dirname, '../../promptbreaker/attacker/templates.txt');
     this.templates = this.loadTemplates();
   }
 
@@ -16,11 +17,19 @@ class PromptRAGService {
    */
   loadTemplates() {
     try {
+      // Check if file exists first
+      if (!fs.existsSync(this.templatesPath)) {
+        console.error(`Templates file not found at: ${this.templatesPath}`);
+        return [];
+      }
+      
       const content = fs.readFileSync(this.templatesPath, 'utf8');
       const lines = content.split('\n').filter(line => 
         line.trim() && 
         !line.startsWith('#')
       );
+      
+      console.log(`Loaded ${lines.length} templates from ${this.templatesPath}`);
       
       return lines.map((line, index) => ({
         id: `template_${index + 1}`,
@@ -30,6 +39,7 @@ class PromptRAGService {
       }));
     } catch (error) {
       console.error('Error loading templates:', error);
+      console.error('Templates path:', this.templatesPath);
       return [];
     }
   }
@@ -538,7 +548,7 @@ class PromptRAGService {
    * @returns {Promise<Object>} - Generated prompts
    */
   async generateFallbackPrompts(userPrompt, options = {}) {
-    console.log('🔄 Using fallback prompt generation');
+    // Use fallback generation when Letta is unavailable
     
     // Check if this is a manufacturing-related prompt
     const isManufacturing = this.isManufacturingPrompt(userPrompt);

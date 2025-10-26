@@ -31,47 +31,30 @@ function generateMockResponse(prompt) {
  */
 export async function generateRAGPrompts(userPrompt, options = {}) {
   try {
-    const response = await apiService.generateRAGPrompts(userPrompt, {
-      maxPrompts: options.maxPrompts || 10,
-      includeMetadata: true,
-      ...options
-    });
-    
-    if (response.success) {
-      return response.data;
-    } else {
-      throw new Error(response.error || 'RAG generation failed');
-    }
+    const response = await apiService.generateRAGPrompts(userPrompt, options);
+    return response.data;
   } catch (error) {
-    console.error('RAG API Error:', error);
-    throw error;
+    console.error('RAG prompt generation failed:', error);
+    return { editedPrompts: [] };
   }
 }
 
 /**
- * Sends a prompt to the AI model using the server-side API.
+ * Gets a response from the Qwen model via HuggingFace API
  * @param {string} prompt The user's input text.
- * @param {string} modelId The model ID to use (default: Qwen/Qwen2.5-7B-Instruct).
+ * @param {string} modelId The model ID to use.
  * @returns {Promise<string>} The generated text response.
  */
 export async function getQwenResponse(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruct') {
   try {
-    console.log(`🚀 FORCING REAL LLM CALL...`);
-    console.log(`   📝 RAG Prompt: "${prompt}"`);
-    console.log(`   🎯 Model: ${modelId}`);
-    console.log(`   🌐 API URL: ${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`);
-    console.log(`   🔍 Environment check: VITE_API_URL = ${import.meta.env.VITE_API_URL}`);
-    
-    // FORCE the real server-side API call
+    // Call the real server-side API
     const apiUrl = `${import.meta.env.VITE_API_URL}/api/enhanced-ai/process-prompt`;
-    console.log(`   🌐 Full API URL: ${apiUrl}`);
     
     const requestBody = {
       prompt: prompt,
       userId: 'anonymous',
       modelId: modelId
     };
-    console.log(`   📤 Request body:`, requestBody);
     
     const serverResponse = await fetch(apiUrl, {
       method: 'POST',
@@ -81,44 +64,27 @@ export async function getQwenResponse(prompt, modelId = 'Qwen/Qwen2.5-7B-Instruc
       body: JSON.stringify(requestBody)
     });
 
-    console.log(`📡 FORCED Server response status: ${serverResponse.status}`);
-    console.log(`📡 FORCED Server response headers:`, Object.fromEntries(serverResponse.headers.entries()));
-
     if (serverResponse.ok) {
       const data = await serverResponse.json();
-      console.log(`📊 FORCED Server response data:`, data);
       
       // Check if the server API was successful
       if (data.success && data.generatedText) {
-        console.log(`✅ FORCED REAL LLM response received!`);
-        console.log(`   📏 Length: ${data.generatedText.length} characters`);
-        console.log(`   📄 Preview: ${data.generatedText.substring(0, 100)}...`);
         return data.generatedText;
       } else if (data.generatedText) {
-        console.log(`⚠️ FORCED response but success=false`);
-        console.log(`   📏 Length: ${data.generatedText.length} characters`);
         return data.generatedText;
       } else {
-        console.log(`❌ FORCED Server API failed, no generatedText`);
-        console.log(`   🔍 Error: ${data.error || 'Unknown error'}`);
-        console.log(`   🔍 Full response:`, data);
         // Server API failed, provide a mock response
         return generateMockResponse(prompt);
       }
     } else {
-      console.log(`❌ FORCED Server response not OK: ${serverResponse.status}`);
-      const errorText = await serverResponse.text();
-      console.log(`   🔍 Error response: ${errorText}`);
+      console.error(`Server response not OK: ${serverResponse.status}`);
     }
 
     // If server API is not available, provide a mock response
-    console.log(`⚠️ FORCED Fallback to mock response`);
     return generateMockResponse(prompt);
 
   } catch (error) {
-    console.error('❌ FORCED AI API Error:', error);
-    console.error('   🔍 Error details:', error.message);
-    console.error('   📊 Error stack:', error.stack);
+    console.error('AI API Error:', error);
     // Return a mock response instead of throwing
     return generateMockResponse(prompt);
   }

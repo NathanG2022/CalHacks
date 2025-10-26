@@ -12,9 +12,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [serverStatus, setServerStatus] = useState('unknown');
   
-  // Debug: Add console log to verify component is loading
-  console.log('🎯 Dashboard component loaded');
-  
   // RAG-related state
   const [ragPrompts, setRagPrompts] = useState([]);
   const [ragLoading, setRagLoading] = useState(false);
@@ -341,7 +338,6 @@ const Dashboard = () => {
             <button 
             className="px-6 py-3 bg-black text-white hover:bg-red-700 transition"
             onClick={() => {
-              console.log('🎯 TEST BUTTON CLICKED - Console logs are working!');
               setShowNewJobModal(true);
             }}
             >
