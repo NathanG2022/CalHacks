@@ -2,10 +2,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const supabase = require("./supabase");
-const portFinder = require('./utils/portFinder');
-const sharedPortConfig = require('../shared-config/portConfig');
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -36,23 +35,6 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
-});
-
-// Port configuration endpoint for client synchronization
-app.get('/api/port-config', (req, res) => {
-  const config = sharedPortConfig.getPortConfig();
-  if (config) {
-    res.json({
-      port: config.port,
-      timestamp: config.timestamp,
-      status: 'synchronized'
-    });
-  } else {
-    res.status(404).json({
-      status: 'not_found',
-      message: 'No port configuration available'
-    });
-  }
 });
 
 // Authentication routes
@@ -211,75 +193,9 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server with synchronized port detection
-const startServer = async () => {
-  try {
-    // Clean up any stale configurations first
-    await sharedPortConfig.cleanupStale();
-    
-    // Check if there's already a port configuration
-    let PORT = sharedPortConfig.getServerPort();
-    
-    if (!PORT || !sharedPortConfig.isConfigRecent()) {
-      // Find an available port dynamically
-      PORT = await portFinder.findAvailablePort();
-      // Save the port configuration for client to use
-      sharedPortConfig.setPortConfig(PORT);
-    } else {
-      console.log(`📋 Using configured port: ${PORT}`);
-      // Validate the port is still available
-      const isAvailable = await portFinder.isPortAvailable(PORT);
-      if (!isAvailable) {
-        console.log(`⚠️ Configured port ${PORT} is no longer available, finding new port...`);
-        PORT = await portFinder.findAvailablePort();
-        sharedPortConfig.setPortConfig(PORT);
-      }
-    }
-    
-    const server = app.listen(PORT, () => {
-      const actualPort = server.address().port;
-      console.log(`🚀 CalHacks Server running on http://localhost:${actualPort}`);
-      console.log(`📊 Health check: http://localhost:${actualPort}/api/health`);
-      console.log(`📝 Items API: http://localhost:${actualPort}/api/items`);
-      console.log(`🔗 API Base URL: http://localhost:${actualPort}/api`);
-      
-      // Update the port config with the actual port
-      sharedPortConfig.setPortConfig(actualPort);
-    });
-    
-    // Handle server errors
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        console.log(`❌ Port ${PORT} is in use, trying next available port...`);
-        // Clean up old config and try again
-        sharedPortConfig.cleanup();
-        portFinder.findAvailablePort().then(newPort => {
-          if (newPort !== PORT) {
-            console.log(`🔄 Retrying on port ${newPort}...`);
-            startServer();
-          }
-        });
-      } else {
-        console.error('❌ Server error:', err);
-      }
-    });
-    
-    // Clean up on exit
-    process.on('exit', () => {
-      sharedPortConfig.cleanup();
-    });
-    
-    process.on('SIGINT', () => {
-      sharedPortConfig.cleanup();
-      process.exit(0);
-    });
-    
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-// Start the server
-startServer();
-
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 CalHacks Server running on http://localhost:${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`📝 Items API: http://localhost:${PORT}/api/items`);
+});

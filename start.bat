@@ -10,4 +10,3 @@ if not exist "node_modules" (
 REM Start the application
 echo 🎯 Starting development servers...
 npm run dev
-
