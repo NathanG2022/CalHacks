@@ -165,7 +165,7 @@ def generate_all_sequences(output_file: str = None):
     if output_file:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(all_sequences, f, indent=2, ensure_ascii=False)
-        print(f"\n\n✅ All sequences saved to: {output_file}")
+        print(f"\n\n[SUCCESS] All sequences saved to: {output_file}")
     
     return all_sequences
 
