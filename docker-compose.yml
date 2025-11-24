@@ -21,9 +21,7 @@ services:
 
   # Letta Server
   letta_server:
-    build:
-      context: ./letta
-      dockerfile: Dockerfile
+    image: letta/letta:latest
     container_name: calhacks-letta-server
     ports:
       - "8084:8083"

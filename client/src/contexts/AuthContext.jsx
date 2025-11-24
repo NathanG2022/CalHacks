@@ -29,7 +29,8 @@ export const AuthProvider = ({ children }) => {
         // Fallback to backend auth
         const token = localStorage.getItem('auth_token');
         if (token) {
-          const response = await fetch('http://localhost:3001/api/auth/me', {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+          const response = await fetch(`${apiUrl}/api/auth/me`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -63,7 +64,8 @@ export const AuthProvider = ({ children }) => {
       }
       
       // Fallback to backend auth
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +98,8 @@ export const AuthProvider = ({ children }) => {
 
       
       // Fallback to backend auth
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+      const response = await fetch(`${apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

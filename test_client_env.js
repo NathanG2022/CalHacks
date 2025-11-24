@@ -15,3 +15,12 @@ if (API_URL !== 'http://localhost:3002') {
 } else {
   console.log('\n✅ API URL is correct, issue must be elsewhere.');
 }
+
+
+
+
+
+
+
+
+

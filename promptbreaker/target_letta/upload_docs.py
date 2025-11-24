@@ -35,13 +35,20 @@ class LettaDocManager:
         Returns:
             Response from Letta API
         """
-        endpoint = f"{self.base_url}/api/sources"
+        endpoint = f"{self.base_url}/v1/sources/"
 
+        # Get embedding provider from environment (default to google_ai for Gemini)
+        embedding_provider = os.getenv("LETTA_EMBEDDING_PROVIDER", "google_ai")
+        embedding_model = os.getenv("LETTA_EMBEDDING_MODEL", "text-embedding-004")
+        embedding_dim = int(os.getenv("LETTA_EMBEDDING_DIM", "768"))  # Gemini embeddings are 768-dim
+        
         payload = {
             "name": filename,
             "description": metadata.get("description", "") if metadata else "",
             "embedding_config": {
-                "embedding_model": "text-embedding-ada-002"  # or your chosen model
+                "embedding_model": embedding_model,
+                "embedding_endpoint_type": embedding_provider,
+                "embedding_dim": embedding_dim
             },
             "metadata": metadata or {}
         }
@@ -56,7 +63,7 @@ class LettaDocManager:
             print(f"✓ Created source: {filename} (ID: {source_id})")
 
             # Then upload the document content
-            doc_endpoint = f"{self.base_url}/api/sources/{source_id}/upload"
+            doc_endpoint = f"{self.base_url}/v1/sources/{source_id}/upload"
             doc_payload = {
                 "text": text
             }
@@ -92,7 +99,7 @@ class LettaDocManager:
 
     def list_sources(self) -> List[Dict]:
         """List all sources in Letta"""
-        endpoint = f"{self.base_url}/api/sources"
+        endpoint = f"{self.base_url}/v1/sources/"
 
         try:
             response = requests.get(endpoint, headers=self.headers)
@@ -104,7 +111,7 @@ class LettaDocManager:
 
     def delete_source(self, source_id: str) -> bool:
         """Delete a source from Letta"""
-        endpoint = f"{self.base_url}/api/sources/{source_id}"
+        endpoint = f"{self.base_url}/v1/sources/{source_id}"
 
         try:
             response = requests.delete(endpoint, headers=self.headers)

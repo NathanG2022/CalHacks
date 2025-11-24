@@ -39,13 +39,19 @@ class LettaQueryRunner:
                 - canary_detected: Whether canary token was found in response
                 - metadata: Query metadata
         """
-        endpoint = f"{self.base_url}/api/agents/{agent_id}/messages"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}/messages"
 
+        # Letta API expects content as array with type field
         payload = {
             "messages": [
                 {
                     "role": "user",
-                    "text": message
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": message
+                        }
+                    ]
                 }
             ],
             "stream": False
@@ -54,6 +60,23 @@ class LettaQueryRunner:
         try:
             start_time = time.time()
             response = requests.post(endpoint, headers=self.headers, json=payload)
+            
+            # Check for errors before parsing
+            if response.status_code >= 400:
+                error_text = response.text
+                try:
+                    error_data = response.json()
+                    error_text = error_data.get('detail', error_text)
+                    if isinstance(error_text, list) and len(error_text) > 0:
+                        error_text = str(error_data)
+                except:
+                    pass
+                
+                # Check for API key errors specifically (500 from Letta often means OpenAI auth failed)
+                if response.status_code == 500:
+                    # This is likely an OpenAI API key issue
+                    raise requests.exceptions.HTTPError(f"500 Internal Server Error - Likely invalid OpenAI API key. Check Letta logs for details.")
+            
             response.raise_for_status()
             elapsed = time.time() - start_time
 
@@ -64,7 +87,18 @@ class LettaQueryRunner:
             agent_response = ""
             for msg in messages:
                 if msg.get("role") == "assistant":
-                    agent_response = msg.get("text", "")
+                    # Handle both string and array content formats
+                    content = msg.get("content", "")
+                    if isinstance(content, list):
+                        # Extract text from content array
+                        for item in content:
+                            if isinstance(item, dict) and item.get("type") == "text":
+                                agent_response = item.get("text", "")
+                                break
+                        if not agent_response:
+                            agent_response = str(content)
+                    else:
+                        agent_response = str(content)
                     break
 
             # Check for canary token
@@ -90,7 +124,25 @@ class LettaQueryRunner:
             return result
 
         except requests.exceptions.RequestException as e:
-            print(f"✗ Error querying agent: {e}")
+            error_msg = str(e)
+            # Check for specific error types
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_data = e.response.json()
+                    if 'detail' in error_data:
+                        error_msg = error_data['detail']
+                    elif 'error' in error_data:
+                        error_msg = str(error_data['error'])
+                except:
+                    error_msg = e.response.text if hasattr(e.response, 'text') else str(e)
+            
+            # Check for API key errors
+            if '401' in error_msg or 'AuthenticationError' in error_msg or 'API key' in error_msg:
+                print(f"✗ Error querying agent: Invalid OpenAI API key. Please check your .env file.")
+                print(f"  Make sure OPENAI_API_KEY is set to a valid key (not a placeholder)")
+            else:
+                print(f"✗ Error querying agent: {error_msg}")
+            
             return {
                 "response": "",
                 "retrieved_sources": [],
@@ -99,7 +151,7 @@ class LettaQueryRunner:
                     "agent_id": agent_id,
                     "query": message,
                     "timestamp": datetime.now().isoformat(),
-                    "error": str(e),
+                    "error": error_msg,
                     "success": False
                 }
             }
@@ -120,7 +172,7 @@ class LettaQueryRunner:
 
         # Then fetch agent's current state/memory (for deeper inspection)
         try:
-            memory_endpoint = f"{self.base_url}/api/agents/{agent_id}/memory"
+            memory_endpoint = f"{self.base_url}/v1/agents/{agent_id}/context"
             memory_response = requests.get(memory_endpoint, headers=self.headers)
             memory_response.raise_for_status()
             result["memory_state"] = memory_response.json()
@@ -139,7 +191,7 @@ class LettaQueryRunner:
         Returns:
             List of archival memory entries
         """
-        endpoint = f"{self.base_url}/api/agents/{agent_id}/archival"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}/context"
 
         try:
             response = requests.get(endpoint, headers=self.headers)

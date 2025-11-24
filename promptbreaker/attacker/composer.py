@@ -63,14 +63,21 @@ class PromptComposer:
             template = random.choice(self.templates)
             instruction = random.choice(instructions)
             topic = random.choice(topics)
+            related_topic = random.choice(topics)  # Can be same or different
 
-            # Fill template
-            prompt = template.format(
-                instruction=instruction,
-                topic=topic,
-                hex_instruction=self._to_hex(instruction),
-                b64_instruction=self._to_base64(instruction)
-            )
+            # Fill template - handle both topic and related_topic placeholders
+            try:
+                prompt = template.format(
+                    instruction=instruction,
+                    topic=topic,
+                    related_topic=related_topic,
+                    hex_instruction=self._to_hex(instruction),
+                    b64_instruction=self._to_base64(instruction)
+                )
+            except KeyError as e:
+                # If template has placeholders we don't support, skip it
+                print(f"Warning: Template has unsupported placeholder: {e}")
+                continue
 
             candidates.append({
                 "prompt": prompt,
@@ -78,6 +85,7 @@ class PromptComposer:
                     "template": template,
                     "instruction": instruction,
                     "topic": topic,
+                    "related_topic": related_topic,
                     "generation": "initial",
                     "id": i
                 }

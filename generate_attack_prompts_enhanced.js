@@ -365,3 +365,12 @@ if (require.main === module) {
 }
 
 module.exports = { EnhancedAttackPromptGenerator, ATTACK_METHODS };
+
+
+
+
+
+
+
+
+

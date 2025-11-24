@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { getQwenResponse, generateRAGPrompts } from '../services/ai';
 import CrescendoAttack from '../components/CrescendoAttack';
 import HackerBackground from '../components/HackerBackground';
+import jobsService from '../services/jobsService';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -930,21 +931,77 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-4">
-        <button
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-black"
-          onClick={() => setShowNewJobModal(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2"
-                  onClick={async () => {
-                    if (!newJobName.trim() || !newJobPrompt.trim()) {
-                      alert('Please fill out job name and prompt.');
-                      return;
-                    }
+              {/* Buttons */}
+              <div className="flex justify-between">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-black"
+                  onClick={() => setShowNewJobModal(false)}
+                >
+                  Close
+                </button>
+                <div className="flex gap-3">
+                  <button
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2"
+                    onClick={async () => {
+                      if (!newJobName.trim() || !newJobPrompt.trim()) {
+                        alert('Please fill out job name and prompt.');
+                        return;
+                      }
+
+                      try {
+                        setNewJobLoading(true);
+                        
+                        // Save job to Supabase without running it
+                        const jobData = {
+                          user_id: user?.id || 'anonymous',
+                          name: newJobName,
+                          prompt: newJobPrompt,
+                          jailbreaking_strategy: selectedJailbreakType,
+                          ai_model: selectedModel,
+                          status: 'pending',
+                          results: null,
+                          rag_prompts: null,
+                          success_count: 0,
+                          failure_count: 0,
+                          success_rate: 0.0
+                        };
+
+                        const savedJob = await jobsService.createJob(jobData);
+                        console.log('💾 Job saved to Supabase:', savedJob);
+                        
+                        // Update local items list
+                        setItems(prev => [...prev, { 
+                          id: savedJob.id, 
+                          name: newJobName, 
+                          result: [],
+                          createdAt: savedJob.created_at,
+                          status: savedJob.status
+                        }]);
+
+                        // Clear form and close modal
+                        setNewJobName('');
+                        setNewJobPrompt('');
+                        setShowNewJobModal(false);
+                        
+                        alert('Job saved successfully! You can run it later from the Jobs tab.');
+                      } catch (error) {
+                        console.error('❌ Failed to save job to Supabase:', error);
+                        alert('Failed to save job. Please try again.');
+                      } finally {
+                        setNewJobLoading(false);
+                      }
+                    }}
+                    disabled={newJobLoading}
+                  >
+                    {newJobLoading ? 'Saving...' : 'Save Job'}
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2"
+                          onClick={async () => {
+                            if (!newJobName.trim() || !newJobPrompt.trim()) {
+                              alert('Please fill out job name and prompt.');
+                              return;
+                            }
 
                     try {
                       setNewJobLoading(true);
@@ -1095,8 +1152,38 @@ const Dashboard = () => {
                       console.log('🎉 All RAG prompts have been processed through the LLM!');
                       console.log('📊 Final results:', { name: newJobName, results: ragResults });
 
-                      // Optionally create a lightweight job entry in items list
-                      setItems(prev => [...prev, { id: Date.now(), name: newJobName, result: ragResults }]);
+                      // Save job to Supabase
+                      try {
+                        const jobData = {
+                          user_id: user?.id || 'anonymous',
+                          name: newJobName,
+                          prompt: newJobPrompt,
+                          jailbreaking_strategy: selectedJailbreakType,
+                          ai_model: selectedModel,
+                          status: 'completed',
+                          results: finalResult,
+                          rag_prompts: ragResults,
+                          success_count: finalResult.successfulPrompts,
+                          failure_count: finalResult.failedPrompts,
+                          success_rate: finalResult.successRate
+                        };
+
+                        const savedJob = await jobsService.createJob(jobData);
+                        console.log('💾 Job saved to Supabase:', savedJob);
+                        
+                        // Update local items list
+                        setItems(prev => [...prev, { 
+                          id: savedJob.id, 
+                          name: newJobName, 
+                          result: ragResults,
+                          createdAt: savedJob.created_at,
+                          status: savedJob.status
+                        }]);
+                      } catch (error) {
+                        console.error('❌ Failed to save job to Supabase:', error);
+                        // Still add to local items as fallback
+                        setItems(prev => [...prev, { id: Date.now(), name: newJobName, result: ragResults }]);
+                      }
 
                       // close modal (or keep open to show result) — keep open so user can see result
                       // setShowNewJobModal(false);
@@ -1108,7 +1195,7 @@ const Dashboard = () => {
                     }
                   }}
         >
-          <span>Launch Job</span>
+          <span>Run Job</span>
           <div className="flex gap-1">
             <span className="text-xs bg-indigo-500 px-2 py-1 rounded-full">
               {jailbreakOptions[selectedJailbreakType].icon} {jailbreakOptions[selectedJailbreakType].name}
@@ -1118,7 +1205,8 @@ const Dashboard = () => {
             </span>
           </div>
         </button>
-      </div>
+                </div>
+              </div>
       {/* RAG Prompts Section */}
       {showRAGPrompts && ragPrompts.length > 0 && (
         <div className="mt-4">

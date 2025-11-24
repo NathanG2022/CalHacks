@@ -84,3 +84,12 @@ echo "  • Update: docker-compose up --build -d"
 
 echo ""
 echo "✅ Test complete!"
+
+
+
+
+
+
+
+
+

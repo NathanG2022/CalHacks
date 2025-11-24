@@ -1,39 +1,51 @@
 # PromptBreaker Dockerfile
 # Containerized environment for RAG poisoning attack demo
+# Optimized for build speed and image size
 
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies in a single layer
+# Removed git (not needed at runtime, only in docs)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    git \
     sqlite3 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Copy requirements first (for better caching)
+# Create non-root user for security (before copying files)
+RUN useradd -m -u 1000 appuser
+
+# Set environment variables early (for better caching)
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Copy requirements first (for better layer caching)
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies with BuildKit cache mount
+# This allows pip cache to persist between builds
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
-COPY attacker/ ./attacker/
-COPY target_letta/ ./target_letta/
-COPY orchestrator.py .
+# Copy project files in optimal order (least frequently changed last)
 COPY wait-for-letta.sh .
 RUN chmod +x wait-for-letta.sh
-COPY *.md ./
 
-# Create data directory
-RUN mkdir -p /app/data/logs
+COPY orchestrator.py .
+COPY attacker/ ./attacker/
+COPY target_letta/ ./target_letta/
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV LETTA_URL=http://host.docker.internal:8283
-ENV PYTHONPATH=/app
+# Create data directory with proper permissions and switch to non-root user
+RUN mkdir -p /app/data/logs && \
+    chown -R appuser:appuser /app
+
+USER appuser
 
 # Default command (can be overridden)
 CMD ["python", "-u", "orchestrator.py", "demo"]

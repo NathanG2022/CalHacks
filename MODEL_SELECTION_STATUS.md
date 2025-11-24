@@ -108,3 +108,12 @@ The model selection feature is fully implemented and working! Users can now:
 - View model status throughout the application
 
 The system is ready for testing and the Qwen model is properly configured as the default choice.
+
+
+
+
+
+
+
+
+

@@ -74,3 +74,12 @@ docker-compose up --build -d
 ## 🎉 You're Ready!
 
 Your CalHacks program is now running with Docker and Letta. Happy hacking!
+
+
+
+
+
+
+
+
+

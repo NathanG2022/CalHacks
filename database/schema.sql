@@ -1,3 +1,26 @@
+-- Jobs table for storing user-created jobs
+CREATE TABLE IF NOT EXISTS jobs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    prompt TEXT NOT NULL,
+    jailbreaking_strategy VARCHAR(100) NOT NULL,
+    ai_model VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending', -- pending, running, completed, failed
+    results JSONB,
+    rag_prompts JSONB,
+    success_count INTEGER DEFAULT 0,
+    failure_count INTEGER DEFAULT 0,
+    success_rate DECIMAL(5,2) DEFAULT 0.0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for jobs table
+CREATE INDEX IF NOT EXISTS idx_jobs_user_id ON jobs(user_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+
 -- Enhanced AI Strategy Tracking Database Schema
 -- This schema supports the enhanced workflow with Letta RAG, HuggingFace, and strategy tracking
 

@@ -10,7 +10,7 @@ from typing import Optional, Dict, List
 
 # Letta server configuration
 LETTA_URL = os.getenv("LETTA_URL", "http://localhost:8283")
-API_KEY = os.getenv("sk-let-Zjk1OWE2YWUtNWIzMC00YmU3LWI3OTgtMTg4OTBmN2JiN2RhOjY5N2E3YWI5LTZkYzItNGQwOS1iNzkwLTI1N2QyZGYwMDVkMQ==", "")
+API_KEY = os.getenv("LETTA_API_KEY", "")
 
 class LettaAgentManager:
     """Manages Letta agent creation and configuration"""
@@ -65,19 +65,32 @@ When answering questions:
 
         prompt = system_prompt or (hardened_prompt if hardened else basic_prompt)
 
-        endpoint = f"{self.base_url}/api/agents"
+        endpoint = f"{self.base_url}/v1/agents/"
 
+        # Use Gemini (Google AI) by default - use gemini-1.5-pro which works with Google AI API
+        llm_provider = os.getenv("LETTA_LLM_PROVIDER", "google_ai")
+        llm_model = os.getenv("LETTA_LLM_MODEL", "gemini-1.5-pro")
+        
+        # Use Google AI embeddings (text-embedding-004) for Gemini
+        embedding_provider = os.getenv("LETTA_EMBEDDING_PROVIDER", "google_ai")
+        embedding_model = os.getenv("LETTA_EMBEDDING_MODEL", "text-embedding-004")
+        embedding_dim = int(os.getenv("LETTA_EMBEDDING_DIM", "768"))  # Gemini embeddings are 768-dim
+        
         payload = {
             "name": name,
             "system": prompt,
             "agent_type": "memgpt_agent",
             "llm_config": {
-                "model": "gpt-4",  # or your preferred model
-                "model_endpoint_type": "openai",
+                "model": llm_model,
+                "model_endpoint_type": llm_provider,
+                "model_endpoint": "https://generativelanguage.googleapis.com",  # Explicit Google AI endpoint
+                "provider_name": "google_ai",  # Explicit provider name
                 "context_window": 8192
             },
             "embedding_config": {
-                "embedding_model": "text-embedding-ada-002"
+                "embedding_model": embedding_model,
+                "embedding_endpoint_type": embedding_provider,
+                "embedding_dim": embedding_dim
             },
             "memory": {
                 "human": "User interacting with RAG system",
@@ -107,10 +120,10 @@ When answering questions:
 
     def attach_source_to_agent(self, agent_id: str, source_id: str) -> bool:
         """Attach a source to an agent"""
-        endpoint = f"{self.base_url}/api/agents/{agent_id}/sources/{source_id}"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}/sources/attach/{source_id}"
 
         try:
-            response = requests.post(endpoint, headers=self.headers)
+            response = requests.patch(endpoint, headers=self.headers)
             response.raise_for_status()
             print(f"  ✓ Attached source {source_id} to agent {agent_id}")
             return True
@@ -120,7 +133,7 @@ When answering questions:
 
     def list_agents(self) -> List[Dict]:
         """List all agents"""
-        endpoint = f"{self.base_url}/api/agents"
+        endpoint = f"{self.base_url}/v1/agents/"
 
         try:
             response = requests.get(endpoint, headers=self.headers)
@@ -132,7 +145,7 @@ When answering questions:
 
     def get_agent(self, agent_id: str) -> Dict:
         """Get agent details"""
-        endpoint = f"{self.base_url}/api/agents/{agent_id}"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}"
 
         try:
             response = requests.get(endpoint, headers=self.headers)
@@ -144,7 +157,7 @@ When answering questions:
 
     def delete_agent(self, agent_id: str) -> bool:
         """Delete an agent"""
-        endpoint = f"{self.base_url}/api/agents/{agent_id}"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}"
 
         try:
             response = requests.delete(endpoint, headers=self.headers)
@@ -157,7 +170,7 @@ When answering questions:
 
     def update_agent_system_prompt(self, agent_id: str, new_prompt: str) -> bool:
         """Update an agent's system prompt (for toggling hardening)"""
-        endpoint = f"{self.base_url}/api/agents/{agent_id}/system"
+        endpoint = f"{self.base_url}/v1/agents/{agent_id}"
 
         try:
             response = requests.patch(
@@ -245,7 +258,15 @@ if __name__ == "__main__":
         elif command == "delete" and len(sys.argv) > 2:
             agent_id = sys.argv[2]
             manager.delete_agent(agent_id)
+        elif command == "cleanup":
+            # Delete all existing agents to start fresh
+            agents = manager.list_agents()
+            print(f"\n=== Cleaning up {len(agents)} existing agents ===")
+            for agent in agents:
+                if manager.delete_agent(agent.get('id')):
+                    print(f"  ✓ Deleted: {agent.get('name')}")
+            print("\n✓ Cleanup complete. Run 'setup' to create new agents.")
         else:
-            print("Usage: python create_agent.py [setup|list|delete <agent_id>]")
+            print("Usage: python create_agent.py [setup|list|delete <agent_id>|cleanup]")
     else:
         setup_demo_agents()

@@ -111,11 +111,25 @@ class AttackOrchestrator:
 
         print(f"\nRunning {len(candidates)} queries...\n")
 
+        error_count = 0
         for i, candidate in enumerate(candidates):
             prompt = candidate['prompt']
             print(f"[{i+1}/{len(candidates)}] Querying: {prompt[:60]}...")
 
             result = self.query_runner.query_agent(agent_id, prompt)
+            
+            # Track errors - stop if too many (likely API key issue)
+            if not result.get("metadata", {}).get("success", True):
+                error_count += 1
+                error_msg = result.get("metadata", {}).get("error", "")
+                if "API key" in error_msg or "401" in error_msg or "Authentication" in error_msg:
+                    print(f"\n❌ Invalid OpenAI API key detected!")
+                    print(f"   Please update your .env file with a valid API key.")
+                    print(f"   Get your key from: https://platform.openai.com/api-keys")
+                    break
+                if error_count > 5:
+                    print(f"\n⚠ Too many errors ({error_count}). Stopping batch.")
+                    break
 
             if result['canary_detected']:
                 canary_count += 1
@@ -263,6 +277,30 @@ class AttackOrchestrator:
 
         return summary
 
+    def _check_api_key(self) -> bool:
+        """Check if API key is valid (supports both OpenAI and Google/Gemini)"""
+        llm_provider = os.getenv("LETTA_LLM_PROVIDER", "google_ai")
+        
+        if llm_provider == "google_ai":
+            api_key = os.getenv("GEMINI_API_KEY", "") or os.getenv("GOOGLE_API_KEY", "")
+            if not api_key or api_key.startswith("AIzaSy-your-") or "placeholder" in api_key.lower():
+                print("\n❌ ERROR: Invalid or placeholder Gemini API key detected!")
+                print("   Please set GEMINI_API_KEY in your .env file to a valid key.")
+                print("   Get your key from: https://aistudio.google.com/app/apikey")
+                print("   Run 'python check_env.py' to validate your configuration.")
+                return False
+            print("✓ Using Gemini API (Google AI)")
+        else:
+            api_key = os.getenv("OPENAI_API_KEY", "")
+            if not api_key or api_key.startswith("sk-your-") or "placeholder" in api_key.lower():
+                print("\n❌ ERROR: Invalid or placeholder OpenAI API key detected!")
+                print("   Please set OPENAI_API_KEY in your .env file to a valid key.")
+                print("   Get your key from: https://platform.openai.com/api-keys")
+                print("   Run 'python check_env.py' to validate your configuration.")
+                return False
+            print("✓ Using OpenAI API")
+        return True
+
     def run_demo_workflow(self):
         """
         Run the complete demo workflow:
@@ -271,6 +309,12 @@ class AttackOrchestrator:
         3. Test with poison (vulnerable agent)
         4. Test with poison (hardened agent)
         """
+        # Check API key first
+        if not self._check_api_key():
+            print("\n❌ Cannot run demo without valid API key.")
+            print("   Please update your .env file and restart.")
+            return
+        
         # Load agent config
         config_path = os.path.join(os.path.dirname(__file__), "data", "agent_config.json")
 

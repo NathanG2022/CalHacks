@@ -150,3 +150,12 @@ echo   2. Configure Supabase for the web application
 echo   3. Check the PromptBreaker demo results in .\promptbreaker\data\
 echo.
 pause
+
+
+
+
+
+
+
+
+

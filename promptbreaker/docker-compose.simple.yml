@@ -14,12 +14,26 @@ services:
       - letta-data:/root/.letta
     networks:
       - promptbreaker-net
+    restart: unless-stopped
+    # Resource limits for better resource management (requires docker-compose v1.28+)
+    # For older versions, remove deploy section or use mem_limit/cpus directly
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   # PromptBreaker attacker
   promptbreaker:
     build:
       context: .
       dockerfile: Dockerfile
+      # Enable BuildKit for cache mounts and faster builds
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     container_name: promptbreaker
     depends_on:
       - letta  # Simple dependency (no health check)
@@ -32,7 +46,18 @@ services:
       - ./target_letta:/app/target_letta
     networks:
       - promptbreaker-net
-    # Wait longer for Letta to be ready
+    restart: unless-stopped
+    # Resource limits for better resource management (requires docker-compose v1.28+)
+    # For older versions, remove deploy section or use mem_limit/cpus directly
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    # Wait longer for Letta to be ready (simplified version without healthcheck)
     command: >
       sh -c "
       echo 'Waiting for Letta server to start...' &&
