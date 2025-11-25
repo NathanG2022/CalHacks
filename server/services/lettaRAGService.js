@@ -16,7 +16,16 @@ class LettaRAGService {
   async queryAgent(prompt, options = {}) {
     try {
       const startTime = Date.now();
-      const agentId = options.agentId || this.agentId;
+      let agentId = options.agentId || this.agentId;
+      
+      // Ensure agent ID has the 'agent-' prefix (Letta requires format: agent-{uuid})
+      if (agentId && !agentId.startsWith('agent-')) {
+        agentId = `agent-${agentId}`;
+      }
+      
+      if (!agentId) {
+        throw new Error('Agent ID is required. Set LETTA_AGENT_ID environment variable.');
+      }
       
       // Letta API expects messages array with role and content
       const payload = {
