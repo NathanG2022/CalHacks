@@ -16,16 +16,27 @@ class LettaRAGService {
   async queryAgent(prompt, options = {}) {
     try {
       const startTime = Date.now();
+      const agentId = options.agentId || this.agentId;
       
+      // Letta API expects messages array with role and content
       const payload = {
-        message: prompt,
-        agent_id: options.agentId || this.agentId,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt
+              }
+            ]
+          }
+        ],
         stream: false,
         ...options
       };
 
       const response = await axios.post(
-        `${this.baseUrl}/api/v1/agents/${this.agentId}/messages`,
+        `${this.baseUrl}/v1/agents/${agentId}/messages`,
         payload,
         {
           headers: {
@@ -46,7 +57,18 @@ class LettaRAGService {
 
       for (const message of messages) {
         if (message.role === 'assistant') {
-          agentResponse = message.text || '';
+          // Handle both string and array content formats
+          if (typeof message.content === 'string') {
+            agentResponse = message.content;
+          } else if (Array.isArray(message.content)) {
+            // Extract text from content array
+            const textParts = message.content
+              .filter(item => item.type === 'text')
+              .map(item => item.text || '');
+            agentResponse = textParts.join('\n');
+          } else if (message.text) {
+            agentResponse = message.text;
+          }
           break;
         }
       }
@@ -105,7 +127,7 @@ class LettaRAGService {
         };
 
         const response = await axios.post(
-          `${this.baseUrl}/api/v1/sources`,
+          `${this.baseUrl}/v1/sources/`,
           payload,
           {
             headers: {
