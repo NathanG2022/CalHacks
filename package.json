@@ -23,6 +23,7 @@
   "author": "CalHacks Team",
   "license": "MIT",
   "devDependencies": {
+    "baseline-browser-mapping": "^2.9.11",
     "concurrently": "^8.2.2"
   },
   "dependencies": {

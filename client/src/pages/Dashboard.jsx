@@ -171,47 +171,23 @@ const Dashboard = () => {
 
   const handleGenerateRAGPrompts = async (userPrompt) => {
     try {
-      console.log('🔄 handleGenerateRAGPrompts: Starting...');
-      console.log('   📝 User prompt:', userPrompt);
-      console.log('   🎯 Selected jailbreak type:', selectedJailbreakType);
-      
       setRagLoading(true);
       const selectedOption = jailbreakOptions[selectedJailbreakType];
-      console.log('   🔧 Selected option:', selectedOption);
-      console.log('   🏷️  Categories:', selectedOption.categories);
-      
-      console.log('   🚀 Calling generateRAGPrompts...');
+
       const result = await generateRAGPrompts(userPrompt, {
         maxPrompts: 10,
         includeMetadata: true,
         categories: selectedOption.categories
       });
-      
-      console.log('   📊 Raw result:', result);
-      console.log('   📊 Result type:', typeof result);
-      console.log('   📊 Result keys:', Object.keys(result || {}));
-      
+
       const generatedPrompts = result.editedPrompts || [];
-      console.log('   📝 Extracted prompts:', generatedPrompts);
-      console.log('   📊 Prompt count:', generatedPrompts.length);
-      console.log('   📊 Is array?', Array.isArray(generatedPrompts));
-      
       setRagPrompts(generatedPrompts);
       setShowRAGPrompts(true);
-      console.log('   ✅ RAG prompts generated and set in state');
-      
-      // Return the raw API response for immediate use
-      console.log('   🔄 Returning raw API response:', result);
-      console.log('   🔄 API response success:', result.success);
-      console.log('   🔄 API response data keys:', Object.keys(result.data || {}));
-      console.log('   🔄 API response editedPrompts count:', result.data?.editedPrompts?.length);
-      
+
       return result;
     } catch (error) {
-      console.error('❌ handleGenerateRAGPrompts failed:', error);
-      console.error('   🔍 Error details:', error.message);
-      console.error('   📊 Error stack:', error.stack);
-      alert('Failed to generate RAG prompts. See console for details.');
+      console.error('Failed to generate RAG prompts:', error);
+      alert('Failed to generate RAG prompts. Please try again.');
       return [];
     } finally {
       setRagLoading(false);
@@ -220,24 +196,10 @@ const Dashboard = () => {
 
   const handleGetAIResponse = async (prompt) => {
     try {
-      console.log(`🤖 FORCING LLM call for RAG prompt...`);
-      console.log(`   📝 RAG Prompt: "${prompt}"`);
-      console.log(`   🎯 Model: ${selectedModel}`);
-      console.log(`   🚀 FORCING getQwenResponse call...`);
-      
-      // FORCE call the LLM with the RAG prompt
       const response = await getQwenResponse(prompt, selectedModel);
-      
-      console.log(`🤖 FORCED LLM call completed!`);
-      console.log(`   📏 Response length: ${response.length} characters`);
-      console.log(`   📄 Response preview: ${response.substring(0, 200)}...`);
-      console.log(`   ✅ FORCED REAL LLM response received!`);
-      
       return response;
     } catch (error) {
-      console.error('❌ FORCED LLM call failed:', error);
-      console.error('   🔍 Error details:', error.message);
-      console.error('   📊 Error stack:', error.stack);
+      console.error('LLM call failed:', error);
       throw error;
     }
   };
