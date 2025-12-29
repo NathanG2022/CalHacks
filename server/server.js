@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const supabase = require("./supabase");
+const { findAvailablePort } = require('./utils/portFinder');
+const portConfig = require('../shared-config/portConfig');
 
 // Import enhanced AI routes
 const enhancedAIRoutes = require('./routes/enhancedAI');
@@ -11,15 +13,32 @@ const ragPromptsRoutes = require('./routes/ragPrompts');
 const crescendoRoutes = require('./routes/crescendo');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PREFERRED_PORT = parseInt(process.env.PORT) || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'calhacks-dev-secret-change-in-production';
 const SALT_ROUNDS = 10;
 
-// Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+// Dynamic CORS - will accept any localhost port for development
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow any localhost origin for development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+
+    // Allow configured client URL
+    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // In-memory storage (in a real app, you'd use a database)
@@ -38,11 +57,23 @@ let nextUserId = 1;
 
 // Routes
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'CalHacks Server is running',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
+    port: portConfig.getServerPort()
+  });
+});
+
+// Port configuration endpoint
+app.get('/api/port-config', (req, res) => {
+  const config = portConfig.getConfig();
+  res.json({
+    serverPort: config.serverPort,
+    clientPort: config.clientPort,
+    serverUrl: `http://localhost:${config.serverPort}`,
+    timestamp: Date.now()
   });
 });
 
@@ -261,9 +292,45 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 CalHacks Server running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`📝 Items API: http://localhost:${PORT}/api/items`);
+// Start server with dynamic port detection
+async function startServer() {
+  try {
+    const PORT = await findAvailablePort(PREFERRED_PORT);
+
+    // Save server port to shared config
+    portConfig.setServerPort(PORT);
+
+    app.listen(PORT, () => {
+      console.log('\n🚀 CalHacks Server Started Successfully!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`📡 Server URL:    http://localhost:${PORT}`);
+      console.log(`📊 Health Check:  http://localhost:${PORT}/api/health`);
+      console.log(`🔧 Port Config:   http://localhost:${PORT}/api/port-config`);
+      console.log(`📝 Items API:     http://localhost:${PORT}/api/items`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`✅ Using port ${PORT} (preferred: ${PREFERRED_PORT})`);
+      if (PORT !== PREFERRED_PORT) {
+        console.log(`⚠️  Port ${PREFERRED_PORT} was in use, using ${PORT} instead`);
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Clean up port config on exit
+process.on('SIGINT', () => {
+  console.log('\n👋 Shutting down server...');
+  portConfig.clear();
+  process.exit(0);
 });
+
+process.on('SIGTERM', () => {
+  console.log('\n👋 Shutting down server...');
+  portConfig.clear();
+  process.exit(0);
+});
+
+startServer();

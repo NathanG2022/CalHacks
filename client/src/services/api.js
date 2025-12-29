@@ -1,6 +1,9 @@
 import axios from 'axios';
+import { getApiBaseUrl } from '../utils/portDiscovery';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+// Dynamic API URL - will be discovered at runtime
+let API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+let apiInitialized = false;
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,8 +12,29 @@ const api = axios.create({
   },
 });
 
+// Initialize API with dynamic port discovery
+async function initializeApi() {
+  if (!apiInitialized) {
+    try {
+      const baseUrl = await getApiBaseUrl();
+      API_URL = baseUrl;
+      api.defaults.baseURL = baseUrl;
+      apiInitialized = true;
+      console.log(`🔗 API initialized with base URL: ${baseUrl}`);
+    } catch (error) {
+      console.warn('⚠️  Failed to discover server port, using default');
+    }
+  }
+}
+
+// Initialize on module load
+initializeApi();
+
 // Add auth token to requests
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  // Ensure API is initialized before making requests
+  await initializeApi();
+
   const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
